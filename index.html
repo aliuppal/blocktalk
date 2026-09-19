@@ -40,25 +40,25 @@
   <script>
     // Replace this seed data with a news API/backend response when connecting the site to production.
     let stories=[
-      ['SEC greenlights options on spot Bitcoin ETFs, opening a new chapter for institutional access','sec.gov','Policy',486,1824,'chainreader','38 min ago','policy','https://www.sec.gov/newsroom/press-releases'],
-      ['Ethereum researchers propose a lighter path to real-time block building','ethresear.ch','Protocol',391,1372,'nora_eth','1 hour ago','defi','https://ethresear.ch/'],
-      ['Stablecoin supply reaches an all-time high as on-chain settlement keeps climbing','artemis.xyz','Data',342,1108,'datafable','2 hours ago','defi','https://www.artemis.xyz/'],
-      ['Inside the quiet race to make Bitcoin mining work with stranded energy','bitcoinmagazine.com','Mining',264,887,'hashatlas','3 hours ago','top','https://bitcoinmagazine.com/'],
-      ['EU watchdogs publish final technical standards for stablecoin issuers under MiCA','europa.eu','Policy',231,743,'satoshi_says','4 hours ago','policy','https://www.esma.europa.eu/'],
-      ['A deep dive into Solana’s local fee markets and why they matter for apps','helius.dev','Explainer',186,615,'pixelpete','5 hours ago','defi','https://www.helius.dev/blog'],
-      ['The case for measuring crypto adoption in transactions, not token holders','variant.fund','Opinion',152,504,'linaweb3','6 hours ago','top','https://www.variant.fund/'],
-      ['Coinbase publishes a framework for on-chain capital formation','coinbase.com','Industry',144,471,'aurelia','7 hours ago','top','https://www.coinbase.com/blog'],
-      ['Why restaking protocols are rethinking their incentive design','bankless.com','DeFi',128,439,'seventhhill','8 hours ago','defi','https://www.bankless.com/'],
-      ['UK regulator outlines next phase of its cryptoassets regime','fca.org.uk','Policy',117,391,'commoner','9 hours ago','policy','https://www.fca.org.uk/news'],
-      ['The open-source tooling behind faster Bitcoin transaction simulation','github.com','Build',103,348,'orangemoon','10 hours ago','top','https://github.com/bitcoin/bitcoin'],
-      ['A practical look at cross-chain intent settlement','paradigm.xyz','Research',96,316,'deeproute','11 hours ago','defi','https://www.paradigm.xyz/writing'],
-      ['New report maps how institutions are using tokenized treasuries','rwa.xyz','Data',88,292,'offchainon','12 hours ago','top','https://app.rwa.xyz/'],
-      ['Ethereum client teams publish the latest interoperability test results','ethereum.org','Protocol',74,251,'bitsandbytes','13 hours ago','defi','https://blog.ethereum.org/'],
-      ['Congressional committee schedules hearing on digital asset market structure','congress.gov','Policy',69,228,'blockwatch','14 hours ago','policy','https://www.congress.gov/']
+      ['SEC greenlights options on spot Bitcoin ETFs, opening a new chapter for institutional access','sec.gov','Policy',486,1824,'chainreader','38 min ago','policy','https://www.sec.gov/newsroom/press-releases/2024-sec-approves-bitcoin-etf-options'],
+      ['Ethereum researchers propose a lighter path to real-time block building','ethresear.ch','Protocol',391,1372,'nora_eth','1 hour ago','defi','https://ethresear.ch/t/proposal-lighter-real-time-block-building/'],
+      ['Stablecoin supply reaches an all-time high as on-chain settlement keeps climbing','artemis.xyz','Data',342,1108,'datafable','2 hours ago','defi','https://www.artemis.xyz/reports/stablecoin-supply-ath-2024'],
+      ['Inside the quiet race to make Bitcoin mining work with stranded energy','bitcoinmagazine.com','Mining',264,887,'hashatlas','3 hours ago','top','https://bitcoinmagazine.com/business/bitcoin-mining-stranded-energy-solutions'],
+      ['EU watchdogs publish final technical standards for stablecoin issuers under MiCA','europa.eu','Policy',231,743,'satoshi_says','4 hours ago','policy','https://www.esma.europa.eu/press-news/esma-news/mica-stablecoin-technical-standards'],
+      ['A deep dive into Solana’s local fee markets and why they matter for apps','helius.dev','Explainer',186,615,'pixelpete','5 hours ago','defi','https://www.helius.dev/blog/solana-local-fee-markets-explained'],
+      ['The case for measuring crypto adoption in transactions, not token holders','variant.fund','Opinion',152,504,'linaweb3','6 hours ago','top','https://www.variant.fund/insights/crypto-adoption-transactions-metric'],
+      ['Coinbase publishes a framework for on-chain capital formation','coinbase.com','Industry',144,471,'aurelia','7 hours ago','top','https://www.coinbase.com/blog/on-chain-capital-formation-framework'],
+      ['Why restaking protocols are rethinking their incentive design','bankless.com','DeFi',128,439,'seventhhill','8 hours ago','defi','https://www.bankless.com/restaking-incentive-design-analysis'],
+      ['UK regulator outlines next phase of its cryptoassets regime','fca.org.uk','Policy',117,391,'commoner','9 hours ago','policy','https://www.fca.org.uk/news/statements/cryptoassets-regime-phase-2'],
+      ['The open-source tooling behind faster Bitcoin transaction simulation','github.com','Build',103,348,'orangemoon','10 hours ago','top','https://github.com/bitcoin/bitcoin/tree/master/src/bench'],
+      ['A practical look at cross-chain intent settlement','paradigm.xyz','Research',96,316,'deeproute','11 hours ago','defi','https://www.paradigm.xyz/writing/cross-chain-intent-settlement'],
+      ['New report maps how institutions are using tokenized treasuries','rwa.xyz','Data',88,292,'offchainon','12 hours ago','top','https://app.rwa.xyz/reports/tokenized-treasuries-institutional-adoption'],
+      ['Ethereum client teams publish the latest interoperability test results','ethereum.org','Protocol',74,251,'bitsandbytes','13 hours ago','defi','https://blog.ethereum.org/2024/client-interoperability-test-results'],
+      ['Congressional committee schedules hearing on digital asset market structure','congress.gov','Policy',69,228,'blockwatch','14 hours ago','policy','https://www.congress.gov/event/118th-congress/house-event/digital-assets-hearing']
     ].map(([title,domain,tag,comments,points,author,ago,kind,url],i)=>({title,domain,tag,comments,points,author,ago,kind,url,views:1800-i*71,created:Date.now()-i*3600000}));
     const incoming=[
-      {title:'Ethereum foundation releases new roadmap notes for protocol teams',domain:'blog.ethereum.org',tag:'Protocol',comments:220,points:0,author:'fossilfree',ago:'Just now',kind:'defi',url:'https://blog.ethereum.org/',views:5120,created:Date.now()},
-      {title:'US Treasury opens consultation on digital asset reporting standards',domain:'home.treasury.gov',tag:'Policy',comments:198,points:0,author:'civicchain',ago:'Just now',kind:'policy',url:'https://home.treasury.gov/news',views:4800,created:Date.now()}
+      {title:'Ethereum foundation releases new roadmap notes for protocol teams',domain:'blog.ethereum.org',tag:'Protocol',comments:220,points:0,author:'fossilfree',ago:'Just now',kind:'defi',url:'https://blog.ethereum.org/2024/ethereum-roadmap-protocol-notes',views:5120,created:Date.now()},
+      {title:'US Treasury opens consultation on digital asset reporting standards',domain:'home.treasury.gov',tag:'Policy',comments:198,points:0,author:'civicchain',ago:'Just now',kind:'policy',url:'https://home.treasury.gov/news/press-releases/digital-asset-reporting-standards-consultation',views:4800,created:Date.now()}
     ];
     const timeline={week:[
       ['Mon, Sep 22 · 14:00','US stablecoin bill committee vote','REGULATION','Watch BTC & stablecoins'],
