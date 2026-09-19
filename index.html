@@ -23,7 +23,7 @@
 </head>
 <body>
   <div class="ticker"><b>MARKETS</b><span>BTC&nbsp; $67,218 <i class="up">+2.4%</i></span><span>ETH&nbsp; $3,482 <i class="up">+1.8%</i></span><span>SOL&nbsp; $173.41 <i class="down">−0.6%</i></span><span>24H VOLUME&nbsp; $82.9B</span><span>GAS&nbsp; 14 GWEI</span></div>
-  <header><a class="logo" href="#"><span class="logo-mark">₿</span>blocktalk</a><nav><a class="active" data-view="top" href="#top">Top stories</a><a data-view="latest" href="#latest">Latest</a><a data-view="discussed" href="#discussed">Discussed</a><a data-view="myfeed" href="#my-feed">My feed</a><a data-view="timeline" href="#news-timeline">News timeline</a></nav></header>
+  <header><a class="logo" href="#"><span class="logo-mark">₿</span>blocktalk</a><nav><a class="active" data-view="top" href="#top">Top stories</a><a data-view="latest" href="#latest">Latest</a><a data-view="discussed" href="#discussed">Discussed</a><a data-view="myfeed" href="#my-feed">My feed</a><a data-view="timeline" href="#news-timeline">News Timeline</a></nav></header>
   <main>
     <section class="intro"><div><div class="eyebrow">Community-powered crypto intelligence</div><h1>The crypto stories<br>people are <em>actually</em> discussing.</h1></div><p>No shilling. No noise. Just the most important crypto news, ranked by thoughtful comments and your upvotes.</p></section>
     <div class="filters"><div class="filter-tabs"><button class="tab active" data-filter="top">Most discussed</button><button class="tab" data-filter="latest">Latest</button><button class="tab" data-filter="defi">DeFi</button><button class="tab" data-filter="policy">Policy</button></div><span class="filter-note" id="feed-label">UPDATED 4 MIN AGO</span></div>
@@ -38,8 +38,32 @@
     </section>
   </main><footer><span>© 2025 BLOCKTALK</span><span>BUILT FOR CURIOUS MINDS · NOT FINANCIAL ADVICE</span></footer>
   <script>
+    // Storage keys for 30-minute cache
+    const STORAGE_KEY = 'blocktalk_stories';
+    const STORAGE_TIME_KEY = 'blocktalk_timestamp';
+    const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+    // Check if we should use cached data or fetch fresh
+    function getCachedStories() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const timestamp = localStorage.getItem(STORAGE_TIME_KEY);
+      
+      if (stored && timestamp) {
+        const age = Date.now() - parseInt(timestamp);
+        if (age < CACHE_DURATION) {
+          return JSON.parse(stored);
+        }
+      }
+      return null;
+    }
+
+    function saveStories(storiesData) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storiesData));
+      localStorage.setItem(STORAGE_TIME_KEY, Date.now().toString());
+    }
+
     // Replace this seed data with a news API/backend response when connecting the site to production.
-    let stories=[
+    let stories = getCachedStories() || [
       ['SEC greenlights options on spot Bitcoin ETFs, opening a new chapter for institutional access','sec.gov','Policy',486,1824,'chainreader','38 min ago','policy','https://www.sec.gov/newsroom/press-releases/2024-sec-approves-bitcoin-etf-options'],
       ['Ethereum researchers propose a lighter path to real-time block building','ethresear.ch','Protocol',391,1372,'nora_eth','1 hour ago','defi','https://ethresear.ch/t/proposal-lighter-real-time-block-building/'],
       ['Stablecoin supply reaches an all-time high as on-chain settlement keeps climbing','artemis.xyz','Data',342,1108,'datafable','2 hours ago','defi','https://www.artemis.xyz/reports/stablecoin-supply-ath-2024'],
@@ -56,6 +80,11 @@
       ['Ethereum client teams publish the latest interoperability test results','ethereum.org','Protocol',74,251,'bitsandbytes','13 hours ago','defi','https://blog.ethereum.org/2024/client-interoperability-test-results'],
       ['Congressional committee schedules hearing on digital asset market structure','congress.gov','Policy',69,228,'blockwatch','14 hours ago','policy','https://www.congress.gov/event/118th-congress/house-event/digital-assets-hearing']
     ].map(([title,domain,tag,comments,points,author,ago,kind,url],i)=>({title,domain,tag,comments,points,author,ago,kind,url,views:1800-i*71,created:Date.now()-i*3600000}));
+
+    // Save initial stories to cache if not already cached
+    if (!getCachedStories()) {
+      saveStories(stories);
+    }
     const incoming=[
       {title:'Ethereum foundation releases new roadmap notes for protocol teams',domain:'blog.ethereum.org',tag:'Protocol',comments:220,points:0,author:'fossilfree',ago:'Just now',kind:'defi',url:'https://blog.ethereum.org/2024/ethereum-roadmap-protocol-notes',views:5120,created:Date.now()},
       {title:'US Treasury opens consultation on digital asset reporting standards',domain:'home.treasury.gov',tag:'Policy',comments:198,points:0,author:'civicchain',ago:'Just now',kind:'policy',url:'https://home.treasury.gov/news/press-releases/digital-asset-reporting-standards-consultation',views:4800,created:Date.now()}
@@ -80,9 +109,9 @@
     const score=s=>s.comments*7+s.views*.08+s.points+(voted.has(s.title)?100:0)+Math.max(0,400-(Date.now()-s.created)/3600000*18);
     const visibleStories=()=>{let list=[...stories];if(current==='latest') return list.sort((a,b)=>b.created-a.created);if(current==='discussed') return list.sort((a,b)=>b.comments-a.comments);if(current==='myfeed') return list.filter(x=>['defi','policy'].includes(x.kind)).sort((a,b)=>score(b)-score(a));if(current!=='top') list=list.filter(x=>x.kind===current);return list.sort((a,b)=>score(b)-score(a))};
     function render(){let list=visibleStories();feed.innerHTML=list.length?list.map((s,i)=>`<article class="story"><div class="rank">${i+1}.</div><div class="story-main"><div class="source"><span class="tag">${s.tag}</span><span class="ago">${s.ago}</span></div><h2><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title}</a> <span class="domain">(${s.domain})</span></h2><div class="meta"><b>${s.comments} comments</b> · ${Math.round(s.views/100)/10}k views · ${s.points+(voted.has(s.title)?1:0)} points · posted by ${s.author}</div></div><div class="vote"><button class="${voted.has(s.title)?'voted':''}" aria-label="Upvote" onclick="upvote('${s.title.replace(/'/g,"\\'")}')">▲</button><div class="score">${s.points+(voted.has(s.title)?1:0)}</div></div></article>`).join(''):'<div class="empty" style="display:block">No stories in this category yet.</div>'}
-    function upvote(title){voted.has(title)?voted.delete(title):voted.add(title);render()}
+    function upvote(title){voted.has(title)?voted.delete(title):voted.add(title);saveStories(stories);render()}
     function renderTimeline(){document.querySelector('#timeline-title').textContent=timelineRange==='week'?'This week · Sep 21–27':'Monthly outlook · Sep 21–Oct 21';document.querySelector('#timeline-events').innerHTML=timeline[timelineRange].map(event=>`<tr><td><b>${event[0]}</b></td><td><span class="impact"><i></i>High</span></td><td><div class="event-title">${event[1]}</div></td><td><span class="asset">${event[2]}</span></td><td><div class="event-note">${event[3]}</div></td></tr>`).join('')}
-    function refreshStories(){if(refreshCount<incoming.length) stories.unshift(incoming[refreshCount++]);stories.forEach((s,i)=>{s.comments+=Math.max(1,Math.round(Math.random()*11));s.views+=Math.round(Math.random()*180)});label.textContent='REFRESHED JUST NOW';render()}
+    function refreshStories(){if(refreshCount<incoming.length) stories.unshift(incoming[refreshCount++]);stories.forEach((s,i)=>{s.comments+=Math.max(1,Math.round(Math.random()*11));s.views+=Math.round(Math.random()*180)});label.textContent='REFRESHED JUST NOW';saveStories(stories);render()}
     function setView(view){const isTimeline=view==='timeline';document.querySelector('#feed-page').style.display=isTimeline?'none':'block';document.querySelector('#timeline-page').classList.toggle('show',isTimeline);current=view;document.querySelectorAll('nav a').forEach(link=>link.classList.toggle('active',link.dataset.view===view));document.querySelectorAll('.tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.filter===view));if(isTimeline){renderTimeline();return}label.textContent=view==='latest'?'SORTED BY FRESHNESS':view==='discussed'?'RANKED BY MOST COMMENTS':view==='myfeed'?'PERSONALIZED FOR YOUR INTERESTS':'RANKED BY COMMENTS, VIEWS & VOTES';render()}
     document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setView(b.dataset.filter));
     document.querySelectorAll('nav a[data-view]').forEach(link=>link.onclick=e=>{e.preventDefault();setView(link.dataset.view);});
