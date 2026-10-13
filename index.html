@@ -18,77 +18,162 @@
     aside{padding-top:4px}.sidebox{background:white;border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:17px}.sidebox h3{margin:0 0 14px;font-size:13px;letter-spacing:-.2px}.hot{display:flex;gap:10px;margin:11px 0}.hot span{width:8px;height:8px;background:var(--orange);border-radius:50%;margin-top:6px;flex:none}.hot:nth-child(3) span{background:#9d7cf7}.hot:nth-child(4) span{background:#38bfac}.hot div{font-size:12px;line-height:1.45}.hot b{display:block;font-size:12px}.hot small{font:11px 'DM Mono',monospace;color:#8f968f}.digest{background:#202620;color:white;border-color:#202620}.digest h3{font-size:16px}.digest p{color:#c5cac3;font-size:12px;line-height:1.6}.email{width:100%;border:1px solid #51584f;background:#313831;border-radius:7px;padding:10px;color:white;font-size:12px;margin:5px 0 8px}.digest button{width:100%;border:0;background:var(--lime);color:#192300;border-radius:7px;padding:10px;font-size:12px;font-weight:800}.how{font-size:12px;line-height:1.6;color:#6d746e}.how b{color:#202520}
     footer{max-width:1240px;margin:auto;padding:0 24px 35px;color:#8c938c;font:11px 'DM Mono',monospace;display:flex;justify-content:space-between}.empty{display:none;padding:45px;text-align:center;color:var(--muted)}
     .timeline-page{display:none}.timeline-page.show{display:block}.timeline-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:22px}.timeline-head h1{font-size:31px;letter-spacing:-1.6px;margin:0}.timeline-head p{font-size:13px;color:var(--muted);max-width:390px;line-height:1.6;margin:0}.range-toggle{display:flex;background:#e9ece6;border-radius:8px;padding:3px;gap:2px}.range-toggle button{border:0;background:transparent;padding:8px 12px;font-size:12px;font-weight:800;border-radius:6px;color:#667066}.range-toggle button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px #00000012}.timeline-card{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden}.timeline-bar{padding:15px 18px;background:#202620;color:#fff;display:flex;justify-content:space-between;align-items:center}.timeline-bar h2{font-size:14px;margin:0}.timeline-bar span{font:11px 'DM Mono',monospace;color:#cad2c4}.timeline-table{width:100%;border-collapse:collapse}.timeline-table th{background:#f0f2ed;color:#747c74;text-align:left;font:11px 'DM Mono',monospace;padding:10px 17px}.timeline-table td{padding:14px 17px;border-top:1px solid #edf0eb;font-size:13px}.timeline-table tr:hover{background:#fcfdf9}.impact{display:inline-flex;align-items:center;gap:6px;font:10px 'DM Mono',monospace;text-transform:uppercase;color:#cf402d}.impact i{width:9px;height:9px;background:#ec4c36;border-radius:2px;display:inline-block}.event-title{font-weight:800}.event-note{color:#888f89;font-size:11px;margin-top:3px}.asset{font:11px 'DM Mono',monospace;border:1px solid #e0e5dd;padding:4px 6px;border-radius:4px;color:#566055}.timeline-info{padding:13px 17px;background:#fff7f3;border-top:1px solid #ffe2d6;font-size:11px;color:#9c5a46}.timeline-info b{color:#c9422d}
-    @media(max-width:780px){.ticker{padding:0 16px}header{height:64px;padding:0 16px;gap:16px}nav{display:none}.intro{display:block}.intro p{margin-top:14px}.layout{grid-template-columns:1fr}.layout aside{display:none}main{padding:25px 16px}.story{grid-template-columns:31px minmax(0,1fr) 48px;padding:15px 10px}.intro h1{font-size:28px}.filters{align-items:flex-start}.filter-note{display:none}.filter-tabs{overflow:auto}.tab{padding:7px 8px}.domain{display:none}footer{padding:0 16px 25px}.submit{margin-left:auto}}
+    /* ---- Live data + motion (compositor-only: transform / opacity) ---- */
+    .ticker{padding:0;gap:0;position:relative}.ticker-label{flex:none;padding:0 18px 0 max(24px,calc((100vw - 1240px)/2));background:#1b201d;position:relative;z-index:1;height:100%;display:flex;align-items:center}.ticker-viewport{overflow:hidden;flex:1;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(90deg,transparent,#000 30px,#000 calc(100% - 30px),transparent)}.ticker-track{display:flex;gap:30px;width:max-content;height:100%;align-items:center;animation:marquee 60s linear infinite}.ticker:hover .ticker-track{animation-play-state:paused}.ticker-track span{position:relative}.ticker-track span.flash:after{content:'';position:absolute;inset:-4px -6px;border-radius:4px;background:var(--lime);opacity:0;animation:flash 1.2s ease-out}.ticker-age{flex:none;padding:0 max(24px,calc((100vw - 1240px)/2)) 0 14px;color:#7f897c;font-size:11px}
+    @keyframes marquee{to{transform:translateX(-50%)}}@keyframes flash{0%{opacity:.35}100%{opacity:0}}
+    .story{position:relative;align-items:start}.story:after{content:'';position:absolute;inset:0;box-shadow:0 10px 30px -12px rgba(25,40,15,.28);opacity:0;transition:opacity .25s ease;pointer-events:none;z-index:1}.story:hover:after{opacity:1}.story:hover{background:var(--card)}
+    .story h2 a .arrow{display:inline-block;margin-left:3px;opacity:0;transform:translate(-4px,2px);transition:transform .2s cubic-bezier(.2,0,0,1),opacity .2s}.story h2 a:hover .arrow,.story h2 a:focus-visible .arrow{opacity:1;transform:translate(0,0)}
+    .story.enter{animation:rise .5s cubic-bezier(.2,0,0,1) both;animation-delay:calc(var(--i) * 35ms)}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    .summary{font-size:12.5px;color:#6b726c;line-height:1.5;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .also{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;align-items:center}.also small{font:10px 'DM Mono',monospace;color:#9aa09a;text-transform:uppercase}.also a{font-size:11px;font-weight:700;color:#4d5a46;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;transition:transform .15s ease,background-color .15s}.also a:hover{background:#eef9dd;transform:translateY(-1px)}
+    .src-rank{font:10px 'DM Mono',monospace;color:#335d00;background:#e5f8c7;padding:3px 6px;border-radius:4px}
+    .vote button{transition:transform .15s cubic-bezier(.2,0,0,1)}.vote button:active{transform:scale(.9)}.vote button.pop{animation:pop .35s cubic-bezier(.2,0,0,1)}@keyframes pop{50%{transform:scale(1.18)}}
+    .sources-list{list-style:none;margin:0;padding:0}.sources-list li{display:grid;grid-template-columns:22px minmax(0,1fr) 34px;gap:8px;align-items:center;padding:6px 0;font-size:12px}.sources-list .n{font:11px 'DM Mono',monospace;color:#9ba19b}.sources-list a{color:var(--ink);font-weight:700;text-decoration:none}.sources-list a:hover{text-decoration:underline}.bar{height:4px;background:#eef0eb;border-radius:2px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--lime-deep);transform-origin:left;transform:scaleX(0);transition:transform .9s cubic-bezier(.2,0,0,1)}.sources-list .pts{font:11px 'DM Mono',monospace;color:#7d847e;text-align:right}
+    .hot{opacity:0;transform:translateX(-6px);transition:opacity .4s ease,transform .4s cubic-bezier(.2,0,0,1)}.hot.in{opacity:1;transform:none}
+    .skeleton{padding:18px 19px;border-bottom:1px solid var(--line)}.skeleton div{height:12px;border-radius:4px;background:#eef0eb;margin:8px 0;position:relative;overflow:hidden}.skeleton div:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);transform:translateX(-100%);animation:shimmer 1.2s infinite}@keyframes shimmer{to{transform:translateX(100%)}}
+    .error{padding:40px 24px;text-align:center;color:var(--muted);font-size:13px}.error button{margin-top:12px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:8px 14px;font-weight:700}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}.ticker-track{animation:none}.ticker-viewport{overflow-x:auto}}
+    @media(max-width:780px){.ticker-label{padding-left:16px}.ticker-age{display:none}.also small{display:none}.ticker{padding:0 16px}header{height:64px;padding:0 16px;gap:16px}nav{display:none}.intro{display:block}.intro p{margin-top:14px}.layout{grid-template-columns:1fr}.layout aside{display:none}main{padding:25px 16px}.story{grid-template-columns:31px minmax(0,1fr) 48px;padding:15px 10px}.intro h1{font-size:28px}.filters{align-items:flex-start}.filter-note{display:none}.filter-tabs{overflow:auto}.tab{padding:7px 8px}.domain{display:none}footer{padding:0 16px 25px}.submit{margin-left:auto}}
   </style>
 </head>
 <body>
-  <div class="ticker"><b>MARKETS</b><span>BTC&nbsp; $67,218 <i class="up">+2.4%</i></span><span>ETH&nbsp; $3,482 <i class="up">+1.8%</i></span><span>SOL&nbsp; $173.41 <i class="down">−0.6%</i></span><span>24H VOLUME&nbsp; $82.9B</span><span>GAS&nbsp; 14 GWEI</span></div>
-  <header><a class="logo" href="#"><span class="logo-mark">₿</span>blocktalk</a><nav><a class="active" data-view="top" href="#top">Top stories</a><a data-view="latest" href="#latest">Latest</a><a data-view="discussed" href="#discussed">Discussed</a><a data-view="myfeed" href="#my-feed">My feed</a><a data-view="timeline" href="#news-timeline">News Timeline</a></nav></header>
+  <div class="ticker" aria-label="Live crypto prices"><b class="ticker-label">MARKETS</b><div class="ticker-viewport"><div class="ticker-track" id="ticker-track"><span>Loading prices…</span></div></div><span class="ticker-age" id="ticker-age"></span></div>
+  <header><a class="logo" href="#"><span class="logo-mark">₿</span>blocktalk</a><nav><a class="active" data-view="top" href="#top">Top stories</a><a data-view="latest" href="#latest">Latest</a><a data-view="covered" href="#covered">Most covered</a><a data-view="myfeed" href="#my-feed">My feed</a><a data-view="timeline" href="#news-timeline">News Timeline</a></nav></header>
   <main>
-    <section class="intro"><div><div class="eyebrow">Community-powered crypto intelligence</div><h1>The crypto stories<br>people are <em>actually</em> discussing.</h1></div><p>No shilling. No noise. Just the most important crypto news, ranked by thoughtful comments and your upvotes.</p></section>
-    <div class="filters"><div class="filter-tabs"><button class="tab active" data-filter="top">Most discussed</button><button class="tab" data-filter="latest">Latest</button><button class="tab" data-filter="defi">DeFi</button><button class="tab" data-filter="policy">Policy</button></div><span class="filter-note" id="feed-label">UPDATED 4 MIN AGO</span></div>
-    <div class="feed-page" id="feed-page"><div class="layout"><section class="feed" id="feed"></section><aside>
-      <div class="sidebox"><h3>Trending conversations</h3><div class="hot"><span></span><div><b>Ethereum’s next upgrade</b><small>2.8k people talking</small></div></div><div class="hot"><span></span><div><b>Bitcoin ETF flows</b><small>1.6k people talking</small></div></div><div class="hot"><span></span><div><b>Solana validator economics</b><small>987 people talking</small></div></div></div>
-      <div class="sidebox digest"><h3>One calm email.<br>Every Sunday.</h3><p>The week’s sharpest crypto conversations, with the fluff removed.</p><input class="email" placeholder="you@email.com" type="email"><button onclick="this.textContent='You’re on the list ✓'">Get the digest</button></div>
-      <div class="sidebox how"><h3>How ranking works</h3><b>Comments carry the most weight.</b> Votes, discussion quality and freshness decide what rises to the top.</div>
+    <section class="intro"><div><div class="eyebrow">Crypto news from 12 newsrooms, ranked daily</div><h1>The crypto stories<br>every outlet is <em>actually</em> covering.</h1></div><p>We read the top crypto newsrooms every day, group the same story across sites, and rank it by source authority, how widely it’s covered and how fresh it is.</p></section>
+    <div class="filters"><div class="filter-tabs"><button class="tab active" data-filter="top">Top ranked</button><button class="tab" data-filter="latest">Latest</button><button class="tab" data-filter="markets">Markets</button><button class="tab" data-filter="defi">DeFi</button><button class="tab" data-filter="policy">Policy</button></div><span class="filter-note" id="feed-label">LOADING…</span></div>
+    <div class="feed-page" id="feed-page"><div class="layout"><section class="feed" id="feed" aria-live="polite"></section><aside>
+      <div class="sidebox"><h3>Trending topics</h3><div id="trending"></div></div>
+      <div class="sidebox"><h3>Source rankings</h3><ol class="sources-list" id="sources"></ol></div>
+      <div class="sidebox digest"><h3>One calm email.<br>Every Sunday.</h3><p>The week’s sharpest crypto stories, with the fluff removed.</p><input class="email" placeholder="you@email.com" type="email"><button onclick="this.textContent='You’re on the list ✓'">Get the digest</button></div>
+      <div class="sidebox how"><h3>How ranking works</h3><b>Coverage carries the most weight.</b> A story picked up by several outlets rises above one-off posts. Source authority, freshness and trending topics decide the rest. Feeds refresh once a day.</div>
     </aside></div></div>
     <section class="timeline-page" id="timeline-page">
       <div class="timeline-head"><div><div class="eyebrow">High-impact crypto calendar</div><h1>News <em>timeline</em></h1></div><p>Only red-folder events: market-moving decisions, unlocks, upgrades and regulatory deadlines that may affect crypto markets.</p></div>
       <div class="timeline-card"><div class="timeline-bar"><h2 id="timeline-title">This week · Sep 21–27</h2><div class="range-toggle"><button class="range active" data-range="week">Weekly</button><button class="range" data-range="month">Monthly</button></div></div><table class="timeline-table"><thead><tr><th>Date & time</th><th>Impact</th><th>Event</th><th>Asset</th><th>Watch</th></tr></thead><tbody id="timeline-events"></tbody></table><div class="timeline-info"><b>Red folder only:</b> low-impact updates are intentionally excluded. Times are displayed in your local timezone.</div></div>
     </section>
-  </main><footer><span>© 2025 BLOCKTALK</span><span>BUILT FOR CURIOUS MINDS · NOT FINANCIAL ADVICE</span></footer>
+  </main><footer><span>© 2026 BLOCKTALK</span><span>BUILT FOR CURIOUS MINDS · NOT FINANCIAL ADVICE</span></footer>
   <script>
-    // Storage keys for 30-minute cache
-    const STORAGE_KEY = 'blocktalk_stories';
-    const STORAGE_TIME_KEY = 'blocktalk_timestamp';
-    const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+    // ---------- storage (best effort: private windows can throw) ----------
+    const store = {
+      get(k, fallback) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    };
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Check if we should use cached data or fetch fresh
-    function getCachedStories() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const timestamp = localStorage.getItem(STORAGE_TIME_KEY);
-      
-      if (stored && timestamp) {
-        const age = Date.now() - parseInt(timestamp);
-        if (age < CACHE_DURATION) {
-          return JSON.parse(stored);
+    // ---------- helpers ----------
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const safeUrl = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : '#'; } catch { return '#'; } };
+    const ext = 'target="_blank" rel="noopener noreferrer"';
+    function ago(iso) {
+      const m = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000));
+      if (m < 1) return 'just now'; if (m < 60) return `${m} min ago`;
+      const h = Math.round(m / 60); if (h < 24) return `${h} hour${h > 1 ? 's' : ''} ago`;
+      const d = Math.round(h / 24); return `${d} day${d > 1 ? 's' : ''} ago`;
+    }
+
+    // ---------- state ----------
+    let stories = [], sources = [], current = 'top', voted = new Set(store.get('blocktalk_votes', []));
+    const feed = document.querySelector('#feed'), label = document.querySelector('#feed-label');
+    const rankScore = (s) => s.score + (voted.has(s.url) ? 25 : 0);
+    const LABELS = { top: 'RANKED BY COVERAGE, SOURCE & FRESHNESS', latest: 'SORTED BY FRESHNESS', covered: 'MOST OUTLETS COVERING', myfeed: 'YOUR UPVOTES + DEFI & POLICY', markets: 'MARKETS · RANKED', defi: 'DEFI · RANKED', policy: 'POLICY · RANKED' };
+
+    function visibleStories() {
+      const list = [...stories];
+      if (current === 'latest') return list.sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
+      if (current === 'covered') return list.sort((a, b) => b.coverage - a.coverage || rankScore(b) - rankScore(a));
+      if (current === 'myfeed') return list.filter((s) => voted.has(s.url) || ['defi', 'policy'].includes(s.kind)).sort((a, b) => rankScore(b) - rankScore(a));
+      const filtered = ['markets', 'defi', 'policy'].includes(current) ? list.filter((s) => s.kind === current) : list;
+      return filtered.sort((a, b) => rankScore(b) - rankScore(a));
+    }
+
+    function storyHtml(s, i) {
+      const also = s.also?.length ? `<div class="also"><small>Also on</small>${s.also.map((a) => `<a href="${esc(safeUrl(a.url))}" ${ext}>${esc(a.source)}</a>`).join('')}</div>` : '';
+      const pts = Math.round(rankScore(s));
+      return `<article class="story" data-key="${esc(s.url)}" style="--i:${Math.min(i, 14)}">
+        <div class="rank">${i + 1}.</div>
+        <div class="story-main">
+          <div class="source"><span class="tag">${esc(s.tag)}</span><span class="src-rank" title="Source ranking">#${esc(s.source_rank ?? '–')} ${esc(s.source)}</span><span class="ago">${esc(ago(s.published_at))}</span></div>
+          <h2><a href="${esc(safeUrl(s.url))}" ${ext}>${esc(s.title)}<span class="arrow" aria-hidden="true">↗</span></a> <span class="domain">(${esc(s.domain)})</span></h2>
+          ${s.summary ? `<p class="summary">${esc(s.summary)}</p>` : ''}
+          <div class="meta"><b>${s.coverage} outlet${s.coverage > 1 ? 's' : ''} covering</b> · score ${pts}</div>
+          ${also}
+        </div>
+        <div class="vote"><button class="${voted.has(s.url) ? 'voted' : ''}" aria-label="Upvote" aria-pressed="${voted.has(s.url)}" data-vote="${esc(s.url)}">▲</button><div class="score">${pts}</div></div>
+      </article>`;
+    }
+
+    // FLIP: measure every row (all reads), re-render, measure again, then
+    // animate only transform/opacity from the old position to the new one.
+    function render({ entrance = false } = {}) {
+      const list = visibleStories();
+      const first = new Map();
+      if (!entrance && !reduceMotion) feed.querySelectorAll('.story').forEach((el) => first.set(el.dataset.key, el.getBoundingClientRect().top));
+
+      feed.innerHTML = list.length ? list.map(storyHtml).join('') : '<div class="empty" style="display:block">No stories in this category yet.</div>';
+      if (reduceMotion) return;
+
+      const rows = [...feed.querySelectorAll('.story')];
+      if (entrance) { rows.forEach((el) => el.classList.add('enter')); return; }
+      const lasts = rows.map((el) => el.getBoundingClientRect().top);
+      rows.forEach((el, i) => {
+        const was = first.get(el.dataset.key);
+        if (was === undefined) {
+          el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: Math.min(i, 12) * 20, easing: 'cubic-bezier(.2,0,0,1)', fill: 'backwards' });
+        } else if (Math.abs(was - lasts[i]) > 1) {
+          el.animate([{ transform: `translateY(${was - lasts[i]}px)` }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,0,0,1)' });
         }
+      });
+    }
+
+    feed.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-vote]');
+      if (!btn) return;
+      const url = btn.dataset.vote;
+      voted.has(url) ? voted.delete(url) : voted.add(url);
+      store.set('blocktalk_votes', [...voted]);
+      render();
+      feed.querySelector(`[data-vote="${CSS.escape(url)}"]`)?.classList.add('pop');
+    });
+
+    function renderSidebar(trending) {
+      const max = Math.max(1, ...sources.map((s) => s.source_score || 0));
+      document.querySelector('#sources').innerHTML = sources.map((s) => `<li>
+          <span class="n">${esc(s.rank ?? '–')}</span>
+          <div><a href="${esc(safeUrl(s.homepage))}" ${ext}>${esc(s.name)}</a><div class="bar"><i data-w="${((s.source_score || 0) / max).toFixed(3)}"></i></div></div>
+          <span class="pts" title="Stories in today's top 50">${esc(s.in_top ?? 0)}</span></li>`).join('');
+      document.querySelector('#trending').innerHTML = (trending || []).map((t) => `<div class="hot"><span></span><div><b>${esc(String(t.topic).toUpperCase())}</b><small>${esc(t.outlets)} outlets covering</small></div></div>`).join('') || '<small class="how">No trending topics yet.</small>';
+      // Grow bars and slide topics in on the next frame (transform/opacity only).
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('#sources .bar i').forEach((b) => (b.style.transform = `scaleX(${b.dataset.w})`));
+        document.querySelectorAll('#trending .hot').forEach((h, i) => setTimeout(() => h.classList.add('in'), i * 70));
+      }));
+    }
+
+    function applyNews(data, { entrance }) {
+      stories = data.stories || [];
+      sources = data.sources || [];
+      if (data.updated_at) label.dataset.updated = data.updated_at;
+      renderSidebar(data.trending);
+      setView(current, { entrance });
+    }
+
+    async function loadNews({ entrance = false } = {}) {
+      try {
+        const r = await fetch('/api/news');
+        if (!r.ok) throw new Error(r.status);
+        const data = await r.json();
+        store.set('blocktalk_news', data);
+        applyNews(data, { entrance });
+      } catch (err) {
+        const cached = store.get('blocktalk_news', null);
+        if (cached) return applyNews(cached, { entrance });
+        feed.innerHTML = '<div class="error">Couldn’t load the news feed.<br><button onclick="loadNews({entrance:true})">Try again</button></div>';
+        label.textContent = 'OFFLINE';
       }
-      return null;
     }
 
-    function saveStories(storiesData) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(storiesData));
-      localStorage.setItem(STORAGE_TIME_KEY, Date.now().toString());
-    }
-
-    // Real, working article URLs from major crypto news sources
-    let stories = getCachedStories() || [
-      ['Bitcoin breaks above $95,000 as institutional demand surges','coindesk.com','Markets',486,1824,'chainreader','38 min ago','top','https://www.coindesk.com/markets/bitcoin-price-analysis'],
-      ['Ethereum developers announce date for next major network upgrade','ethereum.org','Protocol',391,1372,'nora_eth','1 hour ago','defi','https://blog.ethereum.org/2024/11/23/eth-protocol-upgrade'],
-      ['Stablecoin market cap hits record high amid growing adoption','cointelegraph.com','Data',342,1108,'datafable','2 hours ago','defi','https://cointelegraph.com/news/stablecoin-market-cap-record'],
-      ['Bitcoin mining difficulty reaches new all-time high','bitcoinmagazine.com','Mining',264,887,'hashatlas','3 hours ago','top','https://bitcoinmagazine.com/technical/mining-difficulty-ath'],
-      ['EU finalizes MiCA regulations for crypto service providers','reuters.com','Policy',231,743,'satoshi_says','4 hours ago','policy','https://www.reuters.com/technology/eu-mica-crypto-regulations'],
-      ['Solana DeFi TVL surpasses $5 billion milestone','theblock.co','DeFi',186,615,'pixelpete','5 hours ago','defi','https://www.theblock.co/solana-defi-tvl-milestone'],
-      ['Major pension fund allocates 2% portfolio to Bitcoin','bloomberg.com','Institutional',152,504,'linaweb3','6 hours ago','top','https://www.bloomberg.com/crypto/pension-fund-bitcoin-allocation'],
-      ['Coinbase reports record quarterly trading volume','coinbase.com','Industry',144,471,'aurelia','7 hours ago','top','https://www.coinbase.com/blog/q3-2024-earnings'],
-      ['Layer 2 networks process more transactions than Ethereum mainnet','bankless.com','DeFi',128,439,'seventhhill','8 hours ago','defi','https://www.bankless.com/layer2-transaction-volume'],
-      ['UK Treasury proposes new framework for digital assets','gov.uk','Policy',117,391,'commoner','9 hours ago','policy','https://www.gov.uk/government/publications/digital-assets-framework'],
-      ['GitHub activity shows surge in Bitcoin Core development','github.com','Build',103,348,'orangemoon','10 hours ago','top','https://github.com/bitcoin/bitcoin'],
-      ['Cross-chain bridge volume hits monthly record','paradigm.xyz','Research',96,316,'deeproute','11 hours ago','defi','https://www.paradigm.xyz/writing/cross-chain-bridges'],
-      ['Tokenized treasury products exceed $3 billion AUM','rwa.xyz','Data',88,292,'offchainon','12 hours ago','top','https://app.rwa.xyz/'],
-      ['Ethereum gas fees drop to lowest levels in 2 years','decrypt.co','Protocol',74,251,'bitsandbytes','13 hours ago','defi','https://decrypt.co/ethereum-gas-fees-low'],
-      ['SEC Commissioner speaks on crypto regulation path','sec.gov','Policy',69,228,'blockwatch','14 hours ago','policy','https://www.sec.gov/news/speech']
-    ].map(([title,domain,tag,comments,points,author,ago,kind,url],i)=>({title,domain,tag,comments,points,author,ago,kind,url,views:1800-i*71,created:Date.now()-i*3600000}));
-
-    // Save initial stories to cache if not already cached
-    if (!getCachedStories()) {
-      saveStories(stories);
-    }
-    const incoming=[
-      {title:'Ethereum foundation releases new roadmap notes for protocol teams',domain:'blog.ethereum.org',tag:'Protocol',comments:220,points:0,author:'fossilfree',ago:'Just now',kind:'defi',url:'https://blog.ethereum.org/2024/11/eth-protocol-upgrade',views:5120,created:Date.now()},
-      {title:'US Treasury opens consultation on digital asset reporting standards',domain:'home.treasury.gov',tag:'Policy',comments:198,points:0,author:'civicchain',ago:'Just now',kind:'policy',url:'https://home.treasury.gov/news/press-releases/tg2345-digital-assets',views:4800,created:Date.now()}
-    ];
+    // ---------- views ----------
     const timeline={week:[
       ['Mon, Sep 22 · 14:00','US stablecoin bill committee vote','REGULATION','Watch BTC & stablecoins'],
       ['Tue, Sep 23 · 13:30','US GDP revision & risk-assets reaction','MACRO','Watch BTC, ETH'],
@@ -105,19 +190,74 @@
       ['Oct 21 · 20:00','Bitcoin mining difficulty adjustment','BTC','Miner economics watch']
     ]};
     let timelineRange='week';
-    let current='top', voted=new Set(), refreshCount=0; const feed=document.querySelector('#feed'), label=document.querySelector('#feed-label');
-    const score=s=>s.comments*7+s.views*.08+s.points+(voted.has(s.title)?100:0)+Math.max(0,400-(Date.now()-s.created)/3600000*18);
-    const visibleStories=()=>{let list=[...stories];if(current==='latest') return list.sort((a,b)=>b.created-a.created);if(current==='discussed') return list.sort((a,b)=>b.comments-a.comments);if(current==='myfeed') return list.filter(x=>['defi','policy'].includes(x.kind)).sort((a,b)=>score(b)-score(a));if(current!=='top') list=list.filter(x=>x.kind===current);return list.sort((a,b)=>score(b)-score(a))};
-    function render(){let list=visibleStories();feed.innerHTML=list.length?list.map((s,i)=>`<article class="story"><div class="rank">${i+1}.</div><div class="story-main"><div class="source"><span class="tag">${s.tag}</span><span class="ago">${s.ago}</span></div><h2><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.title}</a> <span class="domain">(${s.domain})</span></h2><div class="meta"><b>${s.comments} comments</b> · ${Math.round(s.views/100)/10}k views · ${s.points+(voted.has(s.title)?1:0)} points · posted by ${s.author}</div></div><div class="vote"><button class="${voted.has(s.title)?'voted':''}" aria-label="Upvote" onclick="upvote('${s.title.replace(/'/g,"\\'")}')">▲</button><div class="score">${s.points+(voted.has(s.title)?1:0)}</div></div></article>`).join(''):'<div class="empty" style="display:block">No stories in this category yet.</div>'}
-    function upvote(title){voted.has(title)?voted.delete(title):voted.add(title);saveStories(stories);render()}
     function renderTimeline(){document.querySelector('#timeline-title').textContent=timelineRange==='week'?'This week · Sep 21–27':'Monthly outlook · Sep 21–Oct 21';document.querySelector('#timeline-events').innerHTML=timeline[timelineRange].map(event=>`<tr><td><b>${event[0]}</b></td><td><span class="impact"><i></i>High</span></td><td><div class="event-title">${event[1]}</div></td><td><span class="asset">${event[2]}</span></td><td><div class="event-note">${event[3]}</div></td></tr>`).join('')}
-    function refreshStories(){if(refreshCount<incoming.length) stories.unshift(incoming[refreshCount++]);stories.forEach((s,i)=>{s.comments+=Math.max(1,Math.round(Math.random()*11));s.views+=Math.round(Math.random()*180)});label.textContent='REFRESHED JUST NOW';saveStories(stories);render()}
-    function setView(view){const isTimeline=view==='timeline';document.querySelector('#feed-page').style.display=isTimeline?'none':'block';document.querySelector('#timeline-page').classList.toggle('show',isTimeline);current=view;document.querySelectorAll('nav a').forEach(link=>link.classList.toggle('active',link.dataset.view===view));document.querySelectorAll('.tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.filter===view));if(isTimeline){renderTimeline();return}label.textContent=view==='latest'?'SORTED BY FRESHNESS':view==='discussed'?'RANKED BY MOST COMMENTS':view==='myfeed'?'PERSONALIZED FOR YOUR INTERESTS':'RANKED BY COMMENTS, VIEWS & VOTES';render()}
-    document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setView(b.dataset.filter));
-    document.querySelectorAll('nav a[data-view]').forEach(link=>link.onclick=e=>{e.preventDefault();setView(link.dataset.view);});
-    document.querySelectorAll('.range').forEach(button=>button.onclick=()=>{timelineRange=button.dataset.range;document.querySelectorAll('.range').forEach(item=>item.classList.toggle('active',item===button));renderTimeline()});
-    setInterval(refreshStories,30*60*1000); // checks and re-ranks the feed every 30 minutes
-    async function updatePrices(){try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');if(!r.ok)throw new Error();const d=await r.json(),b=d.bitcoin,e=d.ethereum,s=d.solana,t=document.querySelector('.ticker'),bc=b.usd_24h_change>=0?'+ '+b.usd_24h_change.toFixed(2):b.usd_24h_change.toFixed(2),ec=e.usd_24h_change>=0?'+ '+e.usd_24h_change.toFixed(2):e.usd_24h_change.toFixed(2),sc=s.usd_24h_change>=0?'+ '+s.usd_24h_change.toFixed(2):s.usd_24h_change.toFixed(2);t.innerHTML='<b>MARKETS</b><span>BTC\u00a0 $'+b.usd.toLocaleString()+' <i class="'+(b.usd_24h_change>=0?'up':'down')+'">'+bc+'%</i></span><span>ETH\u00a0 $'+e.usd.toLocaleString()+' <i class="'+(e.usd_24h_change>=0?'up':'down')+'">'+ec+'%</i></span><span>SOL\u00a0 $'+s.usd.toFixed(2)+' <i class="'+(s.usd_24h_change>=0?'up':'down')+'">'+sc+'%</i></span><span>24H VOLUME\u00a0 $82.9B</span><span>GAS\u00a0 14 GWEI</span>';}catch(err){console.log('Price update failed')}}updatePrices();setInterval(updatePrices,60000);
-    render();
-  </script>
+
+    function setView(view, { entrance = false } = {}) {
+      const isTimeline = view === 'timeline';
+      document.querySelector('#feed-page').style.display = isTimeline ? 'none' : 'block';
+      document.querySelector('#timeline-page').classList.toggle('show', isTimeline);
+      current = view;
+      document.querySelectorAll('nav a').forEach((l) => l.classList.toggle('active', l.dataset.view === view));
+      document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.filter === view));
+      if (isTimeline) return renderTimeline();
+      const upd = label.dataset.updated ? ` · UPDATED ${ago(label.dataset.updated).toUpperCase()}` : '';
+      label.textContent = (LABELS[view] || LABELS.top) + upd;
+      if (stories.length) render({ entrance });
+    }
+    document.querySelectorAll('.tab').forEach((b) => (b.onclick = () => setView(b.dataset.filter)));
+    document.querySelectorAll('nav a[data-view]').forEach((l) => (l.onclick = (e) => { e.preventDefault(); setView(l.dataset.view); }));
+    document.querySelectorAll('.range').forEach((button) => (button.onclick = () => { timelineRange = button.dataset.range; document.querySelectorAll('.range').forEach((item) => item.classList.toggle('active', item === button)); renderTimeline(); }));
+
+    // ---------- live prices: /api/prices every 5 minutes ----------
+    const PRICE_INTERVAL = 5 * 60 * 1000;
+    let lastPrices = {}, pricesAt = 0;
+    const usd = (n) => n == null ? '–' : n >= 1 ? '$' + n.toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 0 : 2 }) : '$' + n.toFixed(4);
+    const big = (n) => n >= 1e12 ? `$${(n / 1e12).toFixed(2)}T` : `$${(n / 1e9).toFixed(1)}B`;
+    const pct = (c) => `<i class="${c >= 0 ? 'up' : 'down'}">${c >= 0 ? '+' : '−'}${Math.abs(c ?? 0).toFixed(2)}%</i>`;
+
+    async function fetchPrices() {
+      try {
+        const r = await fetch('/api/prices');
+        if (!r.ok) throw new Error(r.status);
+        return await r.json();
+      } catch {
+        // Direct fallback for static previews without the API.
+        const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+        const d = await r.json();
+        return { coins: [['bitcoin', 'BTC'], ['ethereum', 'ETH'], ['solana', 'SOL']].map(([id, symbol]) => ({ symbol, price: d[id].usd, change24h: d[id].usd_24h_change })) };
+      }
+    }
+
+    async function updatePrices() {
+      try {
+        const d = await fetchPrices();
+        const items = d.coins.map((c) => {
+          const moved = lastPrices[c.symbol] !== undefined && lastPrices[c.symbol] !== c.price;
+          lastPrices[c.symbol] = c.price;
+          return `<span class="${moved ? 'flash' : ''}">${esc(c.symbol)}&nbsp; ${usd(c.price)} ${pct(c.change24h)}</span>`;
+        });
+        if (d.marketCap) items.push(`<span>MARKET CAP&nbsp; ${big(d.marketCap)} ${pct(d.marketCapChange24h)}</span>`);
+        if (d.volume24h) items.push(`<span>24H VOLUME&nbsp; ${big(d.volume24h)}</span>`);
+        const html = items.join('');
+        // Content is duplicated so the -50% marquee loops seamlessly.
+        document.querySelector('#ticker-track').innerHTML = html + html.replace(/class="flash"/g, '');
+        pricesAt = Date.now();
+        tickAge();
+      } catch (err) { console.warn('Price update failed', err); }
+    }
+    function tickAge() {
+      if (!pricesAt) return;
+      const m = Math.floor((Date.now() - pricesAt) / 60000);
+      document.querySelector('#ticker-age').textContent = m < 1 ? 'UPDATED JUST NOW' : `UPDATED ${m}M AGO`;
+    }
+
+    // ---------- boot ----------
+    feed.innerHTML = Array.from({ length: 6 }, () => '<div class="skeleton"><div style="width:22%"></div><div style="width:78%"></div><div style="width:46%"></div></div>').join('');
+    loadNews({ entrance: true });
+    setInterval(() => loadNews(), 30 * 60 * 1000);   // feed only changes daily; cheap CDN hit
+    updatePrices();
+    setInterval(updatePrices, PRICE_INTERVAL);
+    setInterval(tickAge, 30 * 1000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - pricesAt > PRICE_INTERVAL) updatePrices(); });
+</script>
 </body></html>
