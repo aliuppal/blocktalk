@@ -185,6 +185,30 @@
     .sbar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .9s var(--ease)}
     .sources .pts{font:600 11px var(--font-mono);color:var(--muted);text-align:right}
     .panel-note{font:500 10.5px var(--font-mono);color:var(--dim);margin:10px 0 0;line-height:1.5}
+    /* on-chain radar */
+    .radar-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .radar-h h3{display:flex;align-items:center;gap:8px;font:700 13px var(--font-mono);letter-spacing:.06em}
+    .radar-h h3 svg{color:var(--accent);width:15px;height:15px}
+    .radar-h span{font:600 10.5px var(--font-mono);letter-spacing:.06em;color:var(--dim)}
+    .fng{border:1px solid var(--line-2);border-radius:5px;padding:12px;background:var(--bg);overflow:hidden}
+    .fng-now{font:600 11px var(--font-mono);color:var(--text);margin:-4px 0 10px}
+    .fng-top{display:flex;justify-content:space-between;align-items:baseline;font:700 11px var(--font-mono);letter-spacing:.04em;margin-bottom:10px}
+    .fng-top b{color:var(--accent)}.fng-top b small{color:var(--dim);font-weight:600}
+    .fng-bar{position:relative;display:grid;grid-template-columns:25fr 20fr 11fr 20fr 24fr;gap:2px;height:7px}
+    .fng-bar i{border-radius:1px}
+    .fng-bar i:nth-child(1){background:var(--down)}.fng-bar i:nth-child(2){background:var(--t-bitcoin)}.fng-bar i:nth-child(3){background:var(--t-policy)}.fng-bar i:nth-child(4){background:var(--t-defi)}.fng-bar i:nth-child(5){background:var(--accent)}
+    .fng-track{position:absolute;inset:-3px 0;transform:translateX(0);transition:transform 1.1s var(--ease)}
+    .fng-track:after{content:'';position:absolute;left:-2px;top:0;bottom:0;width:4px;border-radius:2px;background:var(--text);box-shadow:0 0 0 2px var(--bg)}
+    .fng-legend{display:flex;justify-content:space-between;margin-top:9px;font:600 10px var(--font-mono);color:var(--dim);white-space:nowrap}
+    .fng-legend span:last-child{color:var(--accent)}
+    .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .tile{border:1px solid var(--line-2);border-radius:5px;padding:10px;background:var(--bg);min-width:0}
+    .tile small{display:block;font:600 9.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+    .tile b{display:block;font:700 13px var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tile em{display:block;font:500 10.5px var(--font-mono);font-style:normal;margin-top:3px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tile.l2 b{color:var(--t-defi)}.tile.btc b{color:var(--t-bitcoin)}
+    .radar-src{font:500 9.5px var(--font-mono);color:var(--dim);margin:10px 0 0}
+    .radar-src a{color:var(--muted)}
     .digest .kicker{font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--t-defi);margin-bottom:8px}
     .digest h3{font-size:19px;line-height:1.25;margin-bottom:8px}
     .digest p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 12px}
@@ -251,6 +275,7 @@
     <symbol id="i-trend-down" viewBox="0 0 24 24"><path d="M4 8l5 5 4-4 7 7"/><path d="M15 16h5v-5"/></symbol>
     <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+    <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
   </svg>
 
@@ -311,6 +336,22 @@
       <div class="layout">
         <section class="feed" id="feed" aria-live="polite"></section>
         <aside>
+          <div class="panel" id="radar">
+            <div class="radar-h"><h3><svg class="i"><use href="#i-radar"/></svg>ON-CHAIN RADAR</h3><span id="radar-age">LIVE FEED</span></div>
+            <div class="fng">
+              <div class="fng-top"><span>CRYPTO FEAR &amp; GREED</span><b id="fng-val">— <small>/ 100</small></b></div>
+              <div class="fng-now" id="fng-label">—</div>
+              <div class="fng-bar" role="img" id="fng-bar" aria-label="Fear and Greed index"><i></i><i></i><i></i><i></i><i></i><span class="fng-track" id="fng-track"></span></div>
+              <div class="fng-legend"><span>Extreme Fear</span><span>Extreme Greed</span></div>
+            </div>
+            <div class="tiles">
+              <div class="tile"><small>ETH burn (24h)</small><b id="t-burn">—</b><em id="t-burn-d">—</em></div>
+              <div class="tile l2"><small>L2 TPS aggregate</small><b id="t-l2">—</b><em id="t-l2-d">—</em></div>
+              <div class="tile btc"><small>BTC hashrate</small><b id="t-hash">—</b><em id="t-hash-d">—</em></div>
+              <div class="tile"><small>BTC next-block fee</small><b id="t-fee">—</b><em id="t-fee-d">—</em></div>
+            </div>
+            <p class="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
+          </div>
           <div class="panel">
             <div class="panel-h"><h3>Trending topics</h3><span class="pill"><span class="dot"></span>TODAY</span></div>
             <div id="trending"></div>
@@ -617,6 +658,44 @@
       renderStats();
     }
 
+    // ---------- on-chain radar: /api/onchain every 15 minutes ----------
+    const vsAvg = (now, avg) => {
+      if (!avg) return '';
+      const p = ((now - avg) / avg) * 100;
+      return `<span class="${p >= 0 ? 'up' : 'down'}">${p >= 0 ? '+' : '−'}${Math.abs(p).toFixed(1)}%</span> vs 7d avg`;
+    };
+    const setTile = (id, main, sub) => { $(`#${id}`).textContent = main; $(`#${id}-d`).innerHTML = sub; };
+    async function loadOnchain() {
+      try {
+        const r = await fetch('/api/onchain');
+        if (!r.ok) throw new Error(r.status);
+        const d = await r.json();
+        if (d.fng) {
+          const v = Math.max(0, Math.min(100, d.fng.value));
+          $('#fng-val').innerHTML = `${v} <small>/ 100</small>`;
+          const diff = d.fng.prev == null ? '' : ` · ${v - d.fng.prev >= 0 ? '+' : '−'}${Math.abs(v - d.fng.prev)} vs yesterday`;
+          $('#fng-label').textContent = d.fng.label + diff;
+          $('#fng-bar').setAttribute('aria-label', `Fear and Greed index ${v} of 100, ${d.fng.label}`);
+          // translateX(%) is relative to the track itself, which spans the bar.
+          requestAnimationFrame(() => ($('#fng-track').style.transform = `translateX(${v}%)`));
+        }
+        if (d.ethBurn) setTile('t-burn', `${d.ethBurn.d1Eth.toLocaleString('en-US', { maximumFractionDigits: 1 })} ETH`, vsAvg(d.ethBurn.d1Eth, d.ethBurn.avg7Eth));
+        if (d.l2) setTile('t-l2', `${Math.round(d.l2.tps).toLocaleString('en-US')} TPS`, vsAvg(d.l2.tps, d.l2.avg7Tps));
+        if (d.btc) {
+          const zh = d.btc.hashrate / 1e21;
+          setTile('t-hash', zh >= 1 ? `${zh.toFixed(2)} ZH/s` : `${(d.btc.hashrate / 1e18).toFixed(0)} EH/s`,
+            `Next diff <span class="${d.btc.diffChange >= 0 ? 'up' : 'down'}">${d.btc.diffChange >= 0 ? '+' : '−'}${Math.abs(d.btc.diffChange).toFixed(1)}%</span>`);
+          $('#t-hash-d').title = `Difficulty adjusts in ${d.btc.blocksToRetarget} blocks`;
+          const f = d.btc.fastestFee;
+          setTile('t-fee', `${f} sat/vB`, f <= 5 ? 'Mempool clear' : f <= 30 ? 'Moderate demand' : '<span class="down">Congested</span>');
+        }
+        $('#radar-age').textContent = 'LIVE FEED';
+      } catch (err) {
+        console.warn('On-chain radar failed', err);
+        $('#radar-age').textContent = 'UNAVAILABLE';
+      }
+    }
+
     // ---------- background beams ----------
     // Light pulses that run a few cells along the grid lines, then respawn
     // somewhere else. Each pulse is one WAAPI animation of transform + opacity.
@@ -661,6 +740,8 @@
 
     // ---------- boot ----------
     startBeams();
+    loadOnchain();
+    setInterval(loadOnchain, 15 * 60 * 1000);
     feed.innerHTML = Array.from({ length: 5 }, () => '<div class="skeleton"></div>').join('');
     updateSavedCount();
     loadNews({ entrance: true });

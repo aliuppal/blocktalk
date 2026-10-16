@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 const routes = {
   '/api/news': () => import('../api/news.js'),
   '/api/prices': () => import('../api/prices.js'),
+  '/api/onchain': () => import('../api/onchain.js'),
 };
 
 http.createServer(async (req, res) => {
