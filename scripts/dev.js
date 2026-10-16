@@ -16,6 +16,8 @@ const api = {
 const rewrites = [
   [/^\/$/, () => '/api/page'],
   [/^\/blog\/?$/, () => '/api/page?view=blog'],
+  [/^\/blog\/rss\.xml$/, () => '/api/page?view=rss&feed=blog'],
+  [/^\/rss\.xml$/, () => '/api/page?view=rss&feed=news'],
   [/^\/blog\/([^/]+)\/cover\.png$/, (m) => `/api/page?view=image&slug=${m[1]}`],
   [/^\/blog\/([^/]+)\/?$/, (m) => `/api/page?view=post&slug=${m[1]}`],
   [/^\/sitemap\.xml$/, () => '/api/page?view=sitemap'],

@@ -104,7 +104,8 @@ async function blogIndex(res) {
   const canonical = `${SITE}/blog`;
   const main = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">BlockTalk</a> / <span>Blog</span></nav>
     <header class="blog-hero"><div class="eyebrow">Daily crypto market summary</div><h1>BlockTalk <mark>blog</mark></h1>
-      <p class="lede">A daily read on the crypto market: what moved, why it moved, and the stories every outlet is covering, built from live prices, on-chain data and 12 newsrooms.</p></header>
+      <p class="lede">A daily read on the crypto market: what moved, why it moved, and the stories every outlet is covering, built from live prices, on-chain data and 12 newsrooms.</p>
+      <p class="rss-link"><a href="/blog/rss.xml">Subscribe via RSS</a></p></header>
     ${posts.length ? `<div class="post-list">${posts.map((p) => `<article class="post-card">
         <a href="/blog/${esc(p.slug)}">${p.has_image ? `<img src="/blog/${esc(p.slug)}/cover.png" alt="${esc(p.image_alt || p.title)}" width="1200" height="630" loading="lazy">` : ''}</a>
         <div><time datetime="${esc(iso(p.published_at))}">${esc(longDate(p.published_at))}</time>
@@ -178,6 +179,73 @@ async function coverImage(res, slug) {
   res.status(200).end(img.bytes);
 }
 
+// ---------- RSS 2.0 feeds ----------
+//   /blog/rss.xml  market summaries, full post HTML + cover image
+//   /rss.xml       today's top ranked crypto stories (links to the original outlets)
+const rfc822 = (d) => new Date(d).toUTCString();
+const cdata = (s) => `<![CDATA[${String(s ?? '').replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
+
+async function rssFeed(res, feed) {
+  const self = feed === 'blog' ? `${SITE}/blog/rss.xml` : `${SITE}/rss.xml`;
+  let channel, items;
+  if (feed === 'blog') {
+    const posts = await listPosts({ limit: 30, withBody: true });
+    channel = { title: 'BlockTalk Blog: Daily Crypto Market Summary', link: `${SITE}/blog`,
+      description: 'Daily crypto market summaries: Bitcoin and Ethereum price action, top gainers and losers, on-chain data and the most-covered crypto news.',
+      updated: posts[0]?.reviewed_at || posts[0]?.published_at };
+    items = posts.map((p) => {
+      const url = `${SITE}/blog/${p.slug}`;
+      return `    <item>
+      <title>${esc(p.title)}</title>
+      <link>${esc(url)}</link>
+      <guid isPermaLink="true">${esc(url)}</guid>
+      <pubDate>${rfc822(p.published_at)}</pubDate>
+      <dc:creator>BlockTalk</dc:creator>
+      ${(p.keywords || []).map((k) => `<category>${esc(k)}</category>`).join('')}
+      <description>${esc(p.excerpt || p.meta_description)}</description>
+      <content:encoded>${cdata(`${p.has_image ? `<p><img src="${url}/cover.png" alt="${esc(p.image_alt || p.title)}" width="1200" height="630"></p>` : ''}${renderMarkdown(p.body_md)}`)}</content:encoded>
+      ${p.has_image ? `<media:content url="${esc(url)}/cover.png" medium="image" type="image/png" width="1200" height="630"/>` : ''}
+    </item>`;
+    });
+  } else {
+    const news = await getNews();
+    channel = { title: 'BlockTalk: Top Ranked Crypto News', link: `${SITE}/`,
+      description: 'The crypto stories every outlet is covering, merged across 12 newsrooms and ranked by coverage, source authority and freshness.',
+      updated: news.updated_at };
+    items = news.stories.slice(0, 30).map((s) => {
+      const also = (s.also || []).map((a) => a.source);
+      const desc = `${s.summary ? `${s.summary} ` : ''}Covered by ${s.coverage} outlet${s.coverage > 1 ? 's' : ''}: ${[s.source, ...also].join(', ')}.`;
+      return `    <item>
+      <title>${esc(s.title)}</title>
+      <link>${esc(safeUrl(s.url))}</link>
+      <guid isPermaLink="true">${esc(safeUrl(s.url))}</guid>
+      <pubDate>${rfc822(s.published_at)}</pubDate>
+      <source url="${esc(self)}">${esc(s.source)}</source>
+      <category>${esc(s.tag)}</category>
+      <description>${esc(desc)}</description>
+    </item>`;
+    });
+  }
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>${esc(channel.title)}</title>
+    <link>${esc(channel.link)}</link>
+    <atom:link href="${esc(self)}" rel="self" type="application/rss+xml"/>
+    <description>${esc(channel.description)}</description>
+    <language>en</language>
+    ${channel.updated ? `<lastBuildDate>${rfc822(channel.updated)}</lastBuildDate>` : ''}
+    <ttl>60</ttl>
+    <image><url>${SITE}/favicon.svg</url><title>${esc(channel.title)}</title><link>${esc(channel.link)}</link></image>
+${items.join('\n')}
+  </channel>
+</rss>
+`;
+  res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8');
+  res.setHeader('Cache-Control', feed === 'blog' ? 'public, s-maxage=300, stale-while-revalidate=3600' : 'public, s-maxage=900, stale-while-revalidate=86400');
+  res.status(200).end(xml);
+}
+
 async function sitemap(res) {
   const posts = await listPosts({ limit: 1000 }).catch(() => []);
   const urls = [
@@ -208,6 +276,7 @@ export default async function handler(req, res) {
     if (view === 'post') return await blogPost(res, slug);
     if (view === 'image') return await coverImage(res, slug);
     if (view === 'sitemap') return await sitemap(res);
+    if (view === 'rss') return await rssFeed(res, q.get('feed') === 'blog' ? 'blog' : 'news');
     if (view === 'admin') return await admin(res);
     return await home(res);
   } catch (err) {

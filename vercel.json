@@ -15,6 +15,8 @@
   "rewrites": [
     { "source": "/", "destination": "/api/page" },
     { "source": "/blog", "destination": "/api/page?view=blog" },
+    { "source": "/blog/rss.xml", "destination": "/api/page?view=rss&feed=blog" },
+    { "source": "/rss.xml", "destination": "/api/page?view=rss&feed=news" },
     { "source": "/blog/:slug/cover.png", "destination": "/api/page?view=image&slug=:slug" },
     { "source": "/blog/:slug", "destination": "/api/page?view=post&slug=:slug" },
     { "source": "/sitemap.xml", "destination": "/api/page?view=sitemap" },
