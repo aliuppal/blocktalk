@@ -156,7 +156,8 @@ async function blogPost(res, slug) {
 async function sendBlog(res, headHtml, mainHtml) {
   const html = (await tpl('blog.html')).replace('<!--SSR:HEAD-->', headHtml).replace('<!--SSR:MAIN-->', mainHtml);
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+  // Short cache: posts auto-publish, so a new one should appear within a minute.
+  res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=600');
   res.status(200).end(html);
 }
 

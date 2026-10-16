@@ -1,11 +1,18 @@
 import { timingSafeEqual } from 'node:crypto';
-import { validateDraft, createDraft, listPosts, reviewPost, SITE } from '../lib/blog.js';
+import { validateDraft, createDraft, listPosts, reviewPost, getPostById, listManaged, updatePost, setHidden, deletePost, SITE } from '../lib/blog.js';
 
 // Blog API (one function to stay inside Vercel Hobby's function limit):
-//   POST ?action=submit   Bearer BLOG_SECRET   routine submits a draft → status 'pending'
+//   POST ?action=submit   Bearer BLOG_SECRET   routine submits a post → published immediately
+//                                              (or 'pending' when BLOG_REQUIRE_REVIEW=true)
 //   GET  ?action=pending  Bearer ADMIN_SECRET  drafts waiting for review (with cover image)
+//   GET  ?action=recent   Bearer ADMIN_SECRET  published + hidden posts for the admin list
+//   GET  ?action=get&id=  Bearer ADMIN_SECRET  one post with its Markdown body (for editing)
+//   POST ?action=update   Bearer ADMIN_SECRET  { id, title?, meta_description?, excerpt?, body_md? }  edit in place
+//   POST ?action=hide | show | delete   Bearer ADMIN_SECRET  { id }
 //   POST ?action=review   Bearer ADMIN_SECRET  { id, decision: 'publish'|'reject', title?, meta_description?, body_md?, note? }
+//                                              'reject' on a published post unpublishes it
 //   GET  ?action=list                          published posts (public)
+const requireReview = () => String(process.env.BLOG_REQUIRE_REVIEW || '').toLowerCase() === 'true';
 function bearerMatches(req, secret) {
   if (!secret) return false;
   const got = Buffer.from(String(req.headers.authorization ?? '').replace(/^Bearer\s+/i, ''));
@@ -27,7 +34,7 @@ export default async function handler(req, res) {
   try {
     if (action === 'list' && req.method === 'GET') {
       const posts = await listPosts({ status: 'published', limit: 30 });
-      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+      res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=600');
       return res.status(200).json({ posts: posts.map((p) => ({ ...p, url: `${SITE}/blog/${p.slug}`, image: p.has_image ? `${SITE}/blog/${p.slug}/cover.png` : null })) });
     }
 
@@ -35,8 +42,29 @@ export default async function handler(req, res) {
       if (!bearerMatches(req, process.env.BLOG_SECRET)) return res.status(401).json({ error: 'unauthorized' });
       let draft;
       try { draft = validateDraft(await readJson(req)); } catch (err) { return res.status(400).json({ error: err.message }); }
-      const row = await createDraft(draft);
-      return res.status(201).json({ ok: true, ...row, review_url: `${SITE}/admin` });
+      const publish = !requireReview();
+      const row = await createDraft(draft, { publish });
+      return res.status(201).json({ ok: true, ...row, url: publish ? `${SITE}/blog/${row.slug}` : null, admin_url: `${SITE}/admin` });
+    }
+
+    if (['recent', 'get', 'update', 'hide', 'show', 'delete'].includes(action)) {
+      if (!bearerMatches(req, process.env.ADMIN_SECRET)) return res.status(401).json({ error: 'unauthorized' });
+      if (action === 'recent' && req.method === 'GET') return res.status(200).json({ posts: await listManaged({ limit: 30 }) });
+      if (action === 'get' && req.method === 'GET') {
+        const post = await getPostById(Number(new URL(req.url, 'http://localhost').searchParams.get('id')));
+        return post ? res.status(200).json({ post }) : res.status(404).json({ error: 'post not found' });
+      }
+      if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
+      const body = await readJson(req);
+      const id = Number(body.id);
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'id required' });
+      try {
+        const row = action === 'update' ? await updatePost({ ...body, id })
+          : action === 'hide' ? await setHidden(id, true)
+          : action === 'show' ? await setHidden(id, false)
+          : await deletePost(id);
+        return res.status(200).json({ ok: true, action, ...row, url: row.status === 'published' ? `${SITE}/blog/${row.slug}` : null });
+      } catch (err) { return res.status(400).json({ error: err.message }); }
     }
 
     if (action === 'pending' && req.method === 'GET') {

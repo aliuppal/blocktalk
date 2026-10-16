@@ -4,114 +4,232 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Blog review | BlockTalk</title>
+  <title>Blog admin | BlockTalk</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#0a0e0d;--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;--text:#e7ece8;--muted:#8d9892;--dim:#5e6964;
-      --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);--down:#f87171;
+      --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);--down:#f87171;--amber:#fbbf24;
       --font-display:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',ui-monospace,monospace}
     *{box-sizing:border-box}html{color-scheme:dark}
     body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display)}
     button,input,textarea{font:inherit;color:inherit}
+    a{color:inherit}
     .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
     h1{font:700 26px var(--font-display);margin:0 0 6px}
-    .sub{color:var(--muted);font:500 12px var(--font-mono);margin:0 0 22px}
-    .login{display:flex;gap:8px;margin-bottom:20px}
+    .sub{color:var(--muted);font:500 12px var(--font-mono);margin:0 0 22px;line-height:1.6}
+    .login{display:flex;gap:8px;margin-bottom:8px}
     input,textarea{width:100%;background:var(--panel);border:1px solid var(--line-2);border-radius:5px;padding:10px;font:13px var(--font-mono)}
     input:focus,textarea:focus{outline:none;border-color:var(--accent-line)}
-    button{border:1px solid var(--line-2);background:var(--panel-2);border-radius:5px;padding:9px 14px;font:700 12px var(--font-mono);cursor:pointer;white-space:nowrap}
-    button.pub{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-    button.rej{color:var(--down)}
+    button{border:1px solid var(--line-2);background:var(--panel-2);border-radius:5px;padding:8px 12px;font:700 11.5px var(--font-mono);cursor:pointer;white-space:nowrap}
+    button:hover{border-color:var(--dim)}
+    button.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+    button.warn{color:var(--amber)}
+    button.del{color:var(--down)}
     button:disabled{opacity:.5;cursor:default}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:18px}
-    .card img{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:4px;border:1px solid var(--line);margin-bottom:14px}
+    .sec{display:flex;align-items:baseline;gap:10px;font:700 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px}
+    .sec small{font-weight:500;letter-spacing:0;text-transform:none;color:var(--dim)}
+    .row{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:8px}
+    .row-h{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px}
+    .row-h time{font:500 11px var(--font-mono);color:var(--dim)}
+    .row-h .t{min-width:0}
+    .row-h .t a{display:block;font-weight:600;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .row-h .t a:hover{color:var(--accent)}
+    .row-h .t small{font:500 10.5px var(--font-mono);color:var(--dim)}
+    .row.hidden-post .t a{color:var(--muted)}
+    .acts{display:flex;gap:6px}
+    .editor{border-top:1px solid var(--line);padding:4px 12px 14px}
     label{display:block;font:600 10.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);margin:12px 0 5px;text-transform:uppercase}
     label small{color:var(--dim);font-weight:500;text-transform:none;letter-spacing:0}
-    textarea{min-height:340px;line-height:1.55;resize:vertical}
+    textarea{min-height:360px;line-height:1.55;resize:vertical}
+    textarea.short{min-height:70px}
+    .ed-acts{display:flex;gap:8px;margin-top:12px}
+    .msg{font:600 12px var(--font-mono);padding:0 12px 10px}.msg:empty{display:none}.msg.ok{color:var(--accent)}.msg.err{color:var(--down)}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:18px}
+    .card img{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:4px;border:1px solid var(--line);margin-bottom:14px}
     .meta{font:500 11px var(--font-mono);color:var(--dim)}
     .kw{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.kw span{font:600 10.5px var(--font-mono);border:1px solid var(--line-2);border-radius:3px;padding:2px 6px;color:var(--muted)}
-    .actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
-    .actions input{flex:1;min-width:180px}
-    .msg{font:600 12px var(--font-mono);margin-top:10px}.msg.ok{color:var(--accent)}.msg.err{color:var(--down)}
-    .empty{color:var(--muted);font:13px var(--font-mono);padding:40px;border:1px dashed var(--line-2);border-radius:6px;text-align:center}
+    .empty{color:var(--muted);font:12px var(--font-mono);padding:22px;border:1px dashed var(--line-2);border-radius:6px;text-align:center;margin:0}
     .bad{color:var(--down)}
+    @media(max-width:640px){.row-h{grid-template-columns:1fr}.acts{flex-wrap:wrap}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Blog review</h1>
-    <p class="sub">Drafts written by the daily Claude routine. Nothing appears on the site until you publish it.</p>
-    <form class="login" id="login"><input id="secret" type="password" placeholder="ADMIN_SECRET" autocomplete="current-password" aria-label="Admin secret"><button type="submit">Load drafts</button></form>
-    <div id="list"></div>
+    <h1>Blog admin</h1>
+    <p class="sub">The daily Claude routine publishes market summaries automatically. Edit, hide or delete any post here. Changes appear on the site within about a minute.</p>
+    <form class="login" id="login"><input id="secret" type="password" placeholder="ADMIN_SECRET" autocomplete="current-password" aria-label="Admin secret"><button type="submit" class="pri">Load posts</button></form>
+    <p class="meta" id="login-msg" role="status"></p>
+
+    <div id="manage" hidden>
+      <h2 class="sec">Published <small id="pub-count"></small></h2>
+      <div id="published"></div>
+      <h2 class="sec">Hidden <small>off the site, kept for later</small></h2>
+      <div id="hidden"></div>
+      <h2 class="sec">Waiting for review <small>only used when BLOG_REQUIRE_REVIEW=true</small></h2>
+      <div id="pending"></div>
+    </div>
   </div>
+
   <script>
-    const $ = (s) => document.querySelector(s);
+    const $ = (s, el = document) => el.querySelector(s);
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const day = (d) => (d ? new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—');
     let secret = '';
     try { secret = sessionStorage.getItem('bt_admin') || ''; } catch {}
     $('#secret').value = secret;
 
+    async function api(action, { method = 'GET', body, query = '' } = {}) {
+      const r = await fetch(`/api/blog?action=${action}${query}`, {
+        method,
+        headers: { authorization: `Bearer ${secret}`, ...(body ? { 'content-type': 'application/json' } : {}) },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw Object.assign(new Error(d.error || `Failed (${r.status})`), { status: r.status });
+      return d;
+    }
+
     const counter = (el, min, max) => {
-      const out = el.parentElement.querySelector(`label[for="${el.id}"] small`);
+      const out = $(`label[for="${el.id}"] small`);
+      if (!out) return;
       const n = el.value.trim().length;
       out.textContent = `${n} chars (target ${min}-${max})`;
       out.classList.toggle('bad', n < min || n > max);
     };
+    const LIMITS = { title: [20, 75], meta_description: [70, 170], excerpt: [40, 300], body_md: [600, 40000] };
 
-    async function load() {
-      const r = await fetch('/api/blog?action=pending', { headers: { authorization: `Bearer ${secret}` } });
-      if (r.status === 401) { $('#list').innerHTML = '<p class="empty bad">Wrong secret.</p>'; return; }
-      const { posts } = await r.json();
-      if (!posts.length) { $('#list').innerHTML = '<p class="empty">No drafts waiting for review.</p>'; return; }
-      $('#list').innerHTML = posts.map((p) => `<div class="card" data-id="${p.id}">
-          ${p.image_base64 ? `<img src="data:${esc(p.image_mime)};base64,${esc(p.image_base64)}" alt="${esc(p.image_alt)}">` : '<p class="meta">No cover image.</p>'}
+    function editorHtml(p) {
+      const f = (k, label, tag = 'input', cls = '') => tag === 'input'
+        ? `<label for="${k}-${p.id}">${label} <small></small></label><input id="${k}-${p.id}" data-f="${k}" value="${esc(p[k])}">`
+        : `<label for="${k}-${p.id}">${label} <small></small></label><textarea id="${k}-${p.id}" data-f="${k}" class="${cls}">${esc(p[k])}</textarea>`;
+      return `<div class="editor">
+          ${f('title', 'Title')}
+          ${f('meta_description', 'Meta description')}
+          ${f('excerpt', 'Excerpt (blog card text)', 'textarea', 'short')}
+          ${f('body_md', 'Post (Markdown)', 'textarea')}
+          <div class="ed-acts"><button class="pri" data-act="save">Save changes</button><button data-act="cancel">Cancel</button></div>
+        </div>`;
+    }
+
+    function managedRow(p) {
+      const hidden = p.status !== 'published';
+      return `<div class="row${hidden ? ' hidden-post' : ''}" data-id="${p.id}" data-slug="${esc(p.slug)}">
+          <div class="row-h">
+            <time>${esc(day(p.published_at))}</time>
+            <div class="t">${hidden ? `<a>${esc(p.title)}</a>` : `<a href="/blog/${esc(p.slug)}" target="_blank" rel="noopener">${esc(p.title)} ↗</a>`}
+              <small>/blog/${esc(p.slug)}${p.reviewed_at && Date.parse(p.reviewed_at) - Date.parse(p.published_at) > 60000 ? ` · edited ${esc(day(p.reviewed_at))}` : ''}${p.review_note === 'auto-published' ? ' · auto-published' : ''}</small></div>
+            <div class="acts">
+              <button data-act="edit">Edit</button>
+              ${hidden ? '<button data-act="show">Show</button>' : '<button class="warn" data-act="hide">Hide</button>'}
+              <button class="del" data-act="delete">Delete</button>
+            </div>
+          </div>
+          <div class="msg" role="status"></div>
+        </div>`;
+    }
+
+    async function loadManaged() {
+      const { posts } = await api('recent');
+      const pub = posts.filter((p) => p.status === 'published'), hid = posts.filter((p) => p.status !== 'published');
+      $('#pub-count').textContent = `${pub.length} live`;
+      $('#published').innerHTML = pub.length ? pub.map(managedRow).join('') : '<p class="empty">No published posts yet. The routine publishes the next market summary automatically.</p>';
+      $('#hidden').innerHTML = hid.length ? hid.map(managedRow).join('') : '<p class="empty">No hidden posts.</p>';
+    }
+
+    async function loadPending() {
+      const { posts } = await api('pending');
+      $('#pending').innerHTML = posts.length ? posts.map((p) => `<div class="card" data-id="${p.id}">
+          ${p.image_base64 ? `<img src="data:${esc(p.image_mime)};base64,${esc(p.image_base64)}" alt="${esc(p.image_alt)}">` : ''}
           <p class="meta">Draft #${p.id} · created ${esc(new Date(p.created_at).toLocaleString())} · /blog/${esc(p.slug)}</p>
           <div class="kw">${(p.keywords || []).map((k) => `<span>${esc(k)}</span>`).join('')}</div>
-          <label for="t${p.id}">Title <small></small></label><input id="t${p.id}" class="f-title" value="${esc(p.title)}">
-          <label for="m${p.id}">Meta description <small></small></label><input id="m${p.id}" class="f-meta" value="${esc(p.meta_description)}">
-          <label for="b${p.id}">Post (Markdown) <small></small></label><textarea id="b${p.id}" class="f-body">${esc(p.body_md)}</textarea>
-          <div class="actions"><input class="f-note" placeholder="Note (optional, saved with the decision)"><button class="pub" data-d="publish">Publish</button><button class="rej" data-d="reject">Reject</button></div>
-          <div class="msg" role="status"></div>
-        </div>`).join('');
-      document.querySelectorAll('.card').forEach((c) => {
-        const t = c.querySelector('.f-title'), m = c.querySelector('.f-meta'), b = c.querySelector('.f-body');
-        const upd = () => { counter(t, 20, 75); counter(m, 70, 170); counter(b, 600, 40000); };
-        [t, m, b].forEach((el) => el.addEventListener('input', upd)); upd();
-      });
+          <p><b>${esc(p.title)}</b></p>
+          <div class="acts"><button class="pri" data-review="publish">Publish</button><button class="del" data-review="reject">Reject</button></div>
+          <p class="msg" role="status"></p>
+        </div>`).join('') : '<p class="empty">Nothing waiting. New posts are published automatically.</p>';
+    }
+
+    async function loadAll() {
+      $('#login-msg').textContent = '';
+      try {
+        await Promise.all([loadManaged(), loadPending()]);
+        $('#manage').hidden = false;
+      } catch (err) {
+        $('#manage').hidden = true;
+        $('#login-msg').innerHTML = `<span class="bad">${err.status === 401 ? 'Wrong secret. Use the ADMIN_SECRET value.' : esc(err.message)}</span>`;
+      }
     }
 
     $('#login').addEventListener('submit', (e) => {
       e.preventDefault();
       secret = $('#secret').value.trim();
       try { sessionStorage.setItem('bt_admin', secret); } catch {}
-      load();
+      loadAll();
     });
 
-    $('#list').addEventListener('click', async (e) => {
-      const btn = e.target.closest('button[data-d]');
+    // Published / hidden rows: edit, hide, show, delete.
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.row button[data-act]');
       if (!btn) return;
-      const card = btn.closest('.card'), msg = card.querySelector('.msg');
-      const decision = btn.dataset.d;
-      if (decision === 'reject' && !confirm('Reject this draft? It will not be published.')) return;
+      const row = btn.closest('.row'), id = Number(row.dataset.id), msg = $('.msg', row);
+      const act = btn.dataset.act;
+      const say = (text, ok = true) => { msg.className = `msg ${ok ? 'ok' : 'err'}`; msg.textContent = text; };
+
+      if (act === 'edit') {
+        if ($('.editor', row)) return $('.editor', row).remove();
+        btn.disabled = true;
+        try {
+          const { post } = await api('get', { query: `&id=${id}` });
+          row.insertAdjacentHTML('beforeend', editorHtml(post));
+          row.querySelectorAll('[data-f]').forEach((el) => {
+            const upd = () => counter(el, ...LIMITS[el.dataset.f]);
+            el.addEventListener('input', upd); upd();
+          });
+        } catch (err) { say(err.message, false); }
+        btn.disabled = false;
+        return;
+      }
+      if (act === 'cancel') return $('.editor', row)?.remove();
+      if (act === 'save') {
+        const body = { id };
+        row.querySelectorAll('[data-f]').forEach((el) => (body[el.dataset.f] = el.value));
+        btn.disabled = true;
+        try {
+          await api('update', { method: 'POST', body });
+          say('Saved. The live page updates within about a minute.');
+          await loadManaged();
+        } catch (err) { say(err.message, false); btn.disabled = false; }
+        return;
+      }
+      if (act === 'hide' && !confirm('Hide this post? It comes off the blog and sitemap but is kept, so you can show it again.')) return;
+      if (act === 'delete' && !confirm('Delete this post permanently? The text and cover image are removed and cannot be recovered.')) return;
+      row.querySelectorAll('button').forEach((b) => (b.disabled = true));
+      try {
+        await api(act, { method: 'POST', body: { id } });
+        await loadManaged();
+      } catch (err) {
+        say(err.message, false);
+        row.querySelectorAll('button').forEach((b) => (b.disabled = false));
+      }
+    });
+
+    // Pending drafts (only when review is switched on).
+    $('#pending').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-review]');
+      if (!btn) return;
+      const card = btn.closest('.card'), msg = $('.msg', card);
+      if (btn.dataset.review === 'reject' && !confirm('Reject this draft?')) return;
       card.querySelectorAll('button').forEach((b) => (b.disabled = true));
-      const r = await fetch('/api/blog?action=review', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` },
-        body: JSON.stringify({ id: card.dataset.id, decision, title: card.querySelector('.f-title').value, meta_description: card.querySelector('.f-meta').value, body_md: card.querySelector('.f-body').value, note: card.querySelector('.f-note').value || null }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (r.ok) {
-        msg.className = 'msg ok';
-        msg.innerHTML = d.url ? `Published → <a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.url)}</a>` : 'Rejected.';
-      } else {
-        msg.className = 'msg err';
-        msg.textContent = d.error || `Failed (${r.status})`;
+      try {
+        await api('review', { method: 'POST', body: { id: card.dataset.id, decision: btn.dataset.review } });
+        await loadAll();
+      } catch (err) {
+        msg.className = 'msg err'; msg.textContent = err.message;
         card.querySelectorAll('button').forEach((b) => (b.disabled = false));
       }
     });
 
-    if (secret) load();
+    if (secret) loadAll();
   </script>
 </body>
 </html>

@@ -1,8 +1,9 @@
 # Daily market summary: routine playbook
 
 The Claude routine follows this file once a day. It writes a crypto market summary from live data,
-renders a cover image, and submits both as a **pending** draft. Nothing is published until the owner
-approves it at https://www.blocktalk.website/admin.
+renders a cover image, and submits both. Submitted posts are **published immediately** (no manual review), so
+accuracy is on you: every fact must come from the brief. The owner can edit, hide or delete any post at
+https://www.blocktalk.website/admin. (If the site sets BLOG_REQUIRE_REVIEW=true, posts wait there as drafts instead.)
 
 Do not commit, push, or edit any files in the repository. Work in a temporary folder.
 
@@ -80,11 +81,13 @@ node scripts/blog-cover.js brief.json "Bitcoin holds $82K as altcoins lead a gre
 
 Open `cover.png` and check the headline fits on 2–3 lines and nothing overlaps. If rendering fails, submit without the cover and say so in the run summary.
 
-## 4. Submit for review
+## 4. Publish
+
+Before submitting, re-read `draft.json` once against `brief.json`: every number, coin and outlet must match. The post goes live as soon as it is accepted.
 
 ```bash
 BLOG_SECRET=<from the routine prompt> node scripts/blog-submit.js draft.json cover.png brief.json
 ```
 
 On a 400 error, fix the field named in the message and resubmit. Finish with a one-paragraph summary:
-the title, the slug, and the review link https://www.blocktalk.website/admin.
+the title, the slug, and the live URL the script prints (https://www.blocktalk.website/blog/<slug>).

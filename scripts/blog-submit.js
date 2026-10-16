@@ -31,5 +31,5 @@ if (!r.ok) {
   console.error(`submit failed (${r.status}): ${body.error || 'unknown error'}`);
   process.exit(1);
 }
-console.log(`draft #${body.id} saved as ${body.status}: /blog/${body.slug}`);
-console.log(`review it at ${body.review_url}`);
+console.log(`post #${body.id} saved as ${body.status}: /blog/${body.slug}`);
+console.log(body.status === 'published' ? `live at ${body.url}` : `waiting for review at ${body.admin_url}`);
