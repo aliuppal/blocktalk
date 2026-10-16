@@ -15,11 +15,16 @@ async function fromCoinGecko() {
   const markets = await m.json();
   const global = g.ok ? (await g.json()).data : null;
   const byId = Object.fromEntries(markets.map((c) => [c.id, c]));
+  const marketCap = global?.total_market_cap?.usd ?? null;
+  let volume24h = global?.total_volume?.usd ?? null;
+  // CoinGecko's global volume occasionally spikes to nonsense (more than the
+  // whole market cap). Real 24h volume is a few percent of market cap.
+  if (volume24h && marketCap && volume24h > marketCap * 0.5) volume24h = null;
   return {
     provider: 'coingecko',
     coins: COINS.filter(([id]) => byId[id]).map(([id, symbol]) => ({ symbol, price: byId[id].current_price, change24h: byId[id].price_change_percentage_24h })),
-    volume24h: global?.total_volume?.usd ?? null,
-    marketCap: global?.total_market_cap?.usd ?? null,
+    volume24h,
+    marketCap,
     marketCapChange24h: global?.market_cap_change_percentage_24h_usd ?? null,
   };
 }
