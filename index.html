@@ -201,6 +201,12 @@
     .fng-track:after{content:'';position:absolute;left:-2px;top:0;bottom:0;width:4px;border-radius:2px;background:var(--text);box-shadow:0 0 0 2px var(--bg)}
     .fng-legend{display:flex;justify-content:space-between;margin-top:9px;font:600 10px var(--font-mono);color:var(--dim);white-space:nowrap}
     .fng-legend span:last-child{color:var(--accent)}
+    .mood{margin-top:8px}
+    .mood-bar{position:relative;height:7px;border-radius:1px;background:linear-gradient(90deg,var(--down),var(--line-2) 50%,var(--up))}
+    .mood-label{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+    .mood-label.up{color:var(--up)}.mood-label.down{color:var(--down)}
+    .mood-why{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:9px;font:500 10px var(--font-mono);color:var(--dim)}
+    .mood-why b{color:var(--muted);font-weight:600}
     .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
     .tile{border:1px solid var(--line-2);border-radius:5px;padding:10px;background:var(--bg);min-width:0}
     .tile small{display:block;font:600 9.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
@@ -343,6 +349,12 @@
               <div class="fng-now" id="fng-label">—</div>
               <div class="fng-bar" role="img" id="fng-bar" aria-label="Fear and Greed index"><i></i><i></i><i></i><i></i><i></i><span class="fng-track" id="fng-track"></span></div>
               <div class="fng-legend"><span>Extreme Fear</span><span>Extreme Greed</span></div>
+            </div>
+            <div class="fng mood" title="Average of the signals below, from −1 (bearish) to +1 (bullish)">
+              <div class="fng-top"><span>MARKET MOOD</span><b class="mood-label" id="mood-label">—</b></div>
+              <div class="mood-bar" role="img" id="mood-bar" aria-label="Market mood"><span class="fng-track" id="mood-track" style="transform:translateX(50%)"></span></div>
+              <div class="fng-legend"><span style="color:var(--down)">Bearish</span><span>Neutral</span><span style="color:var(--up)">Bullish</span></div>
+              <div class="mood-why" id="mood-why"></div>
             </div>
             <div class="tiles">
               <div class="tile"><small>ETH burn (24h)</small><b id="t-burn">—</b><em id="t-burn-d">—</em></div>
@@ -550,6 +562,7 @@
       updatedAt = data.updated_at;
       renderSidebar(data.trending);
       renderStats();
+      renderMood();
       setView(view, { entrance });
     }
 
@@ -639,6 +652,8 @@
     async function updatePrices() {
       try {
         const d = await fetchPrices();
+        priceData = d;
+        renderMood();
         const items = d.coins.map((c) => {
           const moved = lastPrices[c.symbol] !== undefined && lastPrices[c.symbol] !== c.price;
           lastPrices[c.symbol] = c.price;
@@ -665,11 +680,44 @@
       return `<span class="${p >= 0 ? 'up' : 'down'}">${p >= 0 ? '+' : '−'}${Math.abs(p).toFixed(1)}%</span> vs 7d avg`;
     };
     const setTile = (id, main, sub) => { $(`#${id}`).textContent = main; $(`#${id}-d`).innerHTML = sub; };
+
+    // Market mood: average of independent signals, each scaled to −1…+1.
+    let fngData = null, priceData = null;
+    const clamp1 = (x) => Math.max(-1, Math.min(1, x));
+    const signed = (x, digits = 1) => `${x >= 0 ? '+' : '−'}${Math.abs(x).toFixed(digits)}`;
+    function renderMood() {
+      const signals = [], why = [];
+      if (fngData) { signals.push((fngData.value - 50) / 50); why.push(`Fear &amp; Greed <b>${fngData.value}</b>`); }
+      const coins = priceData?.coins || [];
+      const btc = coins.find((c) => c.symbol === 'BTC');
+      if (btc && Number.isFinite(btc.change24h)) { signals.push(clamp1(btc.change24h / 5)); why.push(`BTC 24h <b>${signed(btc.change24h)}%</b>`); }
+      if (coins.length) {
+        const up = coins.filter((c) => c.change24h > 0).length;
+        signals.push((2 * up - coins.length) / coins.length);
+        why.push(`<b>${up}/${coins.length}</b> coins up`);
+      }
+      const recent = stories.filter((s) => ageH(s.published_at) < 24);
+      const bull = recent.filter((s) => tone(s.title) === 'bull').length, bear = recent.filter((s) => tone(s.title) === 'bear').length;
+      if (bull + bear >= 3) { signals.push((bull - bear) / (bull + bear)); why.push(`Headlines <b>${bull}↑ ${bear}↓</b>`); }
+      if (!signals.length) return;
+
+      const score = signals.reduce((a, b) => a + b, 0) / signals.length;
+      const [text, cls, ic] = score > 0.5 ? ['Strongly bullish', 'up', 'trend-up'] : score > 0.15 ? ['Bullish', 'up', 'trend-up']
+        : score < -0.5 ? ['Strongly bearish', 'down', 'trend-down'] : score < -0.15 ? ['Bearish', 'down', 'trend-down'] : ['Neutral', '', null];
+      const label = $('#mood-label');
+      label.className = `mood-label ${cls}`;
+      label.innerHTML = `${ic ? icon(ic) : ''}${text.toUpperCase()} <small style="color:var(--dim)">${signed(score, 2)}</small>`;
+      $('#mood-bar').setAttribute('aria-label', `Market mood ${text}, score ${score.toFixed(2)} from −1 to +1`);
+      $('#mood-why').innerHTML = why.map((w) => `<span>${w}</span>`).join('');
+      requestAnimationFrame(() => ($('#mood-track').style.transform = `translateX(${((score + 1) / 2) * 100}%)`));
+    }
     async function loadOnchain() {
       try {
         const r = await fetch('/api/onchain');
         if (!r.ok) throw new Error(r.status);
         const d = await r.json();
+        fngData = d.fng;
+        renderMood();
         if (d.fng) {
           const v = Math.max(0, Math.min(100, d.fng.value));
           $('#fng-val').innerHTML = `${v} <small>/ 100</small>`;
