@@ -21,8 +21,19 @@
     }
     *{box-sizing:border-box}
     html{color-scheme:dark}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased;
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased}
+
+    /* ---- background grid + travelling beams ----
+       Grid is fixed so beams (positioned in viewport px) stay on its lines while
+       scrolling. Beams move with transform and fade with opacity only. */
+    .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
       background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
+    .beam{position:absolute;left:0;top:0;opacity:0;will-change:transform,opacity}
+    .beam.h{width:var(--len);height:1px;background:linear-gradient(90deg,transparent,var(--accent));box-shadow:0 0 6px rgba(74,222,128,.55)}
+    .beam.h.rev{background:linear-gradient(270deg,transparent,var(--accent))}
+    .beam.v{width:1px;height:var(--len);background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 6px rgba(74,222,128,.55)}
+    .beam.v.rev{background:linear-gradient(0deg,transparent,var(--accent))}
+    .ticker,main,footer{position:relative;z-index:1}
     button,input,select{font:inherit;color:inherit}
     button{cursor:pointer}
     a{color:inherit}
@@ -229,6 +240,7 @@
   </style>
 </head>
 <body>
+  <div class="bg" aria-hidden="true" id="bg"></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></symbol>
@@ -605,7 +617,50 @@
       renderStats();
     }
 
+    // ---------- background beams ----------
+    // Light pulses that run a few cells along the grid lines, then respawn
+    // somewhere else. Each pulse is one WAAPI animation of transform + opacity.
+    const CELL = 32;
+    function startBeams() {
+      if (reduceMotion) return;
+      const layer = $('#bg');
+      const count = innerWidth < 720 ? 4 : 9;
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      const pick = (n) => Math.floor(Math.random() * n);
+
+      function run(el, first) {
+        const horizontal = Math.random() < 0.6;
+        const reverse = Math.random() < 0.5;
+        const len = CELL * (2 + pick(4));                 // tail length: 2–5 cells
+        const cells = 5 + pick(10);                       // distance: 5–14 cells
+        const cols = Math.ceil(innerWidth / CELL), rows = Math.ceil(innerHeight / CELL);
+        const line = (horizontal ? pick(rows) : pick(cols)) * CELL;   // which grid line
+        const start = pick(Math.max(1, (horizontal ? cols : rows) - cells)) * CELL;
+        let a = start - len, b = start + cells * CELL;    // head travels a → b
+        if (reverse) [a, b] = [b, a];
+        const at = (p) => horizontal ? `translate(${p}px, ${line}px)` : `translate(${line}px, ${p}px)`;
+
+        el.className = `beam ${horizontal ? 'h' : 'v'}${reverse ? ' rev' : ''}`;
+        el.style.setProperty('--len', `${len}px`);
+        const mid1 = a + (b - a) * 0.15, mid2 = a + (b - a) * 0.85;
+        const anim = el.animate([
+          { transform: at(a), opacity: 0 },
+          { transform: at(mid1), opacity: 0.85, offset: 0.15 },
+          { transform: at(mid2), opacity: 0.85, offset: 0.85 },
+          { transform: at(b), opacity: 0 },
+        ], { duration: cells * rnd(260, 420), delay: first ? rnd(0, 4000) : rnd(400, 2600), easing: 'linear', fill: 'backwards' });
+        anim.onfinish = () => run(el, false);
+      }
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('i');
+        layer.appendChild(el);
+        run(el, true);
+      }
+    }
+
     // ---------- boot ----------
+    startBeams();
     feed.innerHTML = Array.from({ length: 5 }, () => '<div class="skeleton"></div>').join('');
     updateSavedCount();
     loadNews({ entrance: true });
