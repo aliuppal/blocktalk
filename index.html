@@ -163,7 +163,7 @@
     @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
     /* ---- sidebar ---- */
-    aside{display:flex;flex-direction:column;gap:14px;position:sticky;top:78px}
+    aside{display:flex;flex-direction:column;gap:14px}
     .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px 14px}
     .panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
     .panel h3{margin:0;font:600 15px var(--font-display)}
@@ -187,7 +187,8 @@
     .panel-note{font:500 10.5px var(--font-mono);color:var(--dim);margin:10px 0 0;line-height:1.5}
     /* on-chain radar */
     .radar-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-    .radar-h h3{display:flex;align-items:center;gap:8px;font:700 13px var(--font-mono);letter-spacing:.06em}
+    .radar-h h3{display:flex;align-items:center;gap:8px;font:700 13px var(--font-mono);letter-spacing:.06em;white-space:nowrap}
+    .radar-h{gap:10px}.radar-h > span{white-space:nowrap}
     .radar-h h3 svg{color:var(--accent);width:15px;height:15px}
     .radar-h span{font:600 10.5px var(--font-mono);letter-spacing:.06em;color:var(--dim)}
     .fng{border:1px solid var(--line-2);border-radius:5px;padding:12px;background:var(--bg);overflow:hidden}
@@ -207,6 +208,12 @@
     .mood-label.up{color:var(--up)}.mood-label.down{color:var(--down)}
     .mood-why{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:9px;font:500 10px var(--font-mono);color:var(--dim)}
     .mood-why b{color:var(--muted);font-weight:600}
+    .mood-why .sig{display:inline-flex;align-items:center;gap:4px}
+    .mood-why .sig:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--dim)}
+    .mood-why .sig.up:before{background:var(--up)}.mood-why .sig.down:before{background:var(--down)}
+    .mood-why .sig.up b{color:var(--up)}.mood-why .sig.down b{color:var(--down)}
+    .mood-mix{font:600 10.5px var(--font-mono);color:var(--muted);margin-top:8px}
+    .mood-mix:empty{display:none}
     .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
     .tile{border:1px solid var(--line-2);border-radius:5px;padding:10px;background:var(--bg);min-width:0}
     .tile small{display:block;font:600 9.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
@@ -215,6 +222,25 @@
     .tile.l2 b{color:var(--t-defi)}.tile.btc b{color:var(--t-bitcoin)}
     .radar-src{font:500 9.5px var(--font-mono);color:var(--dim);margin:10px 0 0}
     .radar-src a{color:var(--muted)}
+    /* NY open watchlist */
+    .mv-h{display:flex;align-items:center;gap:6px;font:700 10.5px var(--font-mono);letter-spacing:.06em;margin:4px 0 6px}
+    .mv-h svg{width:13px;height:13px}
+    .mv-cols{display:grid;grid-template-columns:minmax(0,1fr) 78px 50px 54px;gap:6px;font:600 9px var(--font-mono);letter-spacing:.06em;color:var(--dim);padding:0 6px 4px}
+    .mv-cols span:not(:first-child){text-align:right}
+    .mv{list-style:none;margin:0 0 12px;padding:0}
+    .mv li{opacity:0;transform:translateY(4px);transition:opacity .35s ease,transform .35s var(--ease)}
+    .mv li.in{opacity:1;transform:none}
+    .mv a{display:grid;grid-template-columns:minmax(0,1fr) 78px 50px 54px;gap:6px;align-items:center;padding:6px;border-radius:4px;text-decoration:none;font:600 11.5px var(--font-mono);transition:background-color .15s}
+    .mv a:hover{background:var(--panel-2)}
+    .mv .sym{display:flex;align-items:center;gap:7px;min-width:0}
+    .mv .sym img{width:16px;height:16px;border-radius:50%;flex:none;background:var(--line)}
+    .mv .sym b{font-weight:700}
+    .mv .sym small{color:var(--dim);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .mv-n{text-align:right;white-space:nowrap}
+    .mv-n.px{color:var(--text)}
+    #movers .radar-h h3{font-size:12.5px}
+    #ny-clock{font-size:10px}
+    #ny-clock.open{color:var(--accent)}
     .digest .kicker{font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--t-defi);margin-bottom:8px}
     .digest h3{font-size:19px;line-height:1.25;margin-bottom:8px}
     .digest p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 12px}
@@ -354,6 +380,7 @@
               <div class="fng-top"><span>MARKET MOOD</span><b class="mood-label" id="mood-label">—</b></div>
               <div class="mood-bar" role="img" id="mood-bar" aria-label="Market mood"><span class="fng-track" id="mood-track" style="transform:translateX(50%)"></span></div>
               <div class="fng-legend"><span style="color:var(--down)">Bearish</span><span>Neutral</span><span style="color:var(--up)">Bullish</span></div>
+              <div class="mood-mix" id="mood-mix"></div>
               <div class="mood-why" id="mood-why"></div>
             </div>
             <div class="tiles">
@@ -362,7 +389,17 @@
               <div class="tile btc"><small>BTC hashrate</small><b id="t-hash">—</b><em id="t-hash-d">—</em></div>
               <div class="tile"><small>BTC next-block fee</small><b id="t-fee">—</b><em id="t-fee-d">—</em></div>
             </div>
-            <p class="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
+            <p class="radar-src" id="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
+          </div>
+          <div class="panel" id="movers">
+            <div class="radar-h"><h3><svg class="i"><use href="#i-clock"/></svg>NY OPEN WATCHLIST</h3><span id="ny-clock">—</span></div>
+            <div class="mv-h up"><svg class="i"><use href="#i-trend-up"/></svg>STRONGEST MOMENTUM</div>
+            <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
+            <ol class="mv" id="mv-up"></ol>
+            <div class="mv-h down"><svg class="i"><use href="#i-trend-down"/></svg>WEAKEST MOMENTUM</div>
+            <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
+            <ol class="mv" id="mv-down"></ol>
+            <p class="radar-src">Top 100 coins by market cap, ranked by 24h change plus 2× the last hour. Shows what’s already moving into the 9:30 AM ET open, not a forecast. Not financial advice. Data: <a href="https://www.coingecko.com" target="_blank" rel="noopener noreferrer">CoinGecko</a></p>
           </div>
           <div class="panel">
             <div class="panel-h"><h3>Trending topics</h3><span class="pill"><span class="dot"></span>TODAY</span></div>
@@ -685,30 +722,44 @@
     let fngData = null, priceData = null;
     const clamp1 = (x) => Math.max(-1, Math.min(1, x));
     const signed = (x, digits = 1) => `${x >= 0 ? '+' : '−'}${Math.abs(x).toFixed(digits)}`;
+    const MOOD_EDGE = 0.15;
+    const leanOf = (v) => (v > MOOD_EDGE ? 'up' : v < -MOOD_EDGE ? 'down' : '');
     function renderMood() {
-      const signals = [], why = [];
-      if (fngData) { signals.push((fngData.value - 50) / 50); why.push(`Fear &amp; Greed <b>${fngData.value}</b>`); }
+      // Each signal: v in −1…+1, the text shown for it, and which family it belongs to.
+      const signals = [];
+      if (fngData) signals.push({ v: (fngData.value - 50) / 50, html: `Fear &amp; Greed <b>${fngData.value}</b>`, group: 'sentiment' });
       const coins = priceData?.coins || [];
       const btc = coins.find((c) => c.symbol === 'BTC');
-      if (btc && Number.isFinite(btc.change24h)) { signals.push(clamp1(btc.change24h / 5)); why.push(`BTC 24h <b>${signed(btc.change24h)}%</b>`); }
+      if (btc && Number.isFinite(btc.change24h)) signals.push({ v: clamp1(btc.change24h / 5), html: `BTC 24h <b>${signed(btc.change24h)}%</b>`, group: 'prices' });
       if (coins.length) {
         const up = coins.filter((c) => c.change24h > 0).length;
-        signals.push((2 * up - coins.length) / coins.length);
-        why.push(`<b>${up}/${coins.length}</b> coins up`);
+        signals.push({ v: (2 * up - coins.length) / coins.length, html: `<b>${up}/${coins.length}</b> coins up`, group: 'prices' });
       }
       const recent = stories.filter((s) => ageH(s.published_at) < 24);
       const bull = recent.filter((s) => tone(s.title) === 'bull').length, bear = recent.filter((s) => tone(s.title) === 'bear').length;
-      if (bull + bear >= 3) { signals.push((bull - bear) / (bull + bear)); why.push(`Headlines <b>${bull}↑ ${bear}↓</b>`); }
+      if (bull + bear >= 3) signals.push({ v: (bull - bear) / (bull + bear), html: `Headlines <b>${bull}↑ ${bear}↓</b>`, group: 'headlines' });
       if (!signals.length) return;
 
-      const score = signals.reduce((a, b) => a + b, 0) / signals.length;
-      const [text, cls, ic] = score > 0.5 ? ['Strongly bullish', 'up', 'trend-up'] : score > 0.15 ? ['Bullish', 'up', 'trend-up']
-        : score < -0.5 ? ['Strongly bearish', 'down', 'trend-down'] : score < -0.15 ? ['Bearish', 'down', 'trend-down'] : ['Neutral', '', null];
+      const score = signals.reduce((a, s) => a + s.v, 0) / signals.length;
+      // Per-family direction, so a split (e.g. prices up, headlines down) is stated, not hidden in the average.
+      const families = ['prices', 'sentiment', 'headlines'].map((g) => {
+        const xs = signals.filter((s) => s.group === g);
+        return xs.length ? { g, lean: leanOf(xs.reduce((a, s) => a + s.v, 0) / xs.length) } : null;
+      }).filter(Boolean);
+      const mixed = families.some((f) => f.lean === 'up') && families.some((f) => f.lean === 'down');
+
+      const lean = leanOf(score), strong = Math.abs(score) > 0.5;
+      const text = !lean ? (mixed ? 'Mixed' : 'Neutral')
+        : `${strong ? 'Strongly ' : mixed ? 'Leaning ' : ''}${lean === 'up' ? 'bullish' : 'bearish'}`;
       const label = $('#mood-label');
-      label.className = `mood-label ${cls}`;
-      label.innerHTML = `${ic ? icon(ic) : ''}${text.toUpperCase()} <small style="color:var(--dim)">${signed(score, 2)}</small>`;
-      $('#mood-bar').setAttribute('aria-label', `Market mood ${text}, score ${score.toFixed(2)} from −1 to +1`);
-      $('#mood-why').innerHTML = why.map((w) => `<span>${w}</span>`).join('');
+      label.className = `mood-label ${lean}`;
+      label.innerHTML = `${lean ? icon(lean === 'up' ? 'trend-up' : 'trend-down') : ''}${text.toUpperCase()} <small style="color:var(--dim)">${signed(score, 2)}</small>`;
+
+      const arrow = { up: '↑', down: '↓', '': '→' };
+      const name = { prices: 'prices', sentiment: 'Fear &amp; Greed', headlines: 'headlines' };
+      $('#mood-mix').innerHTML = mixed ? `Mixed signals: ${families.map((f) => `<span class="${f.lean}">${name[f.g]} ${arrow[f.lean]}</span>`).join(' · ')}` : '';
+      $('#mood-why').innerHTML = signals.map((s) => `<span class="sig ${leanOf(s.v)}">${s.html}</span>`).join('');
+      $('#mood-bar').setAttribute('aria-label', `Market mood ${text}, score ${score.toFixed(2)} from −1 to +1${mixed ? ', signals disagree' : ''}`);
       requestAnimationFrame(() => ($('#mood-track').style.transform = `translateX(${((score + 1) / 2) * 100}%)`));
     }
     async function loadOnchain() {
@@ -741,6 +792,47 @@
       } catch (err) {
         console.warn('On-chain radar failed', err);
         $('#radar-age').textContent = 'UNAVAILABLE';
+      }
+    }
+
+    // ---------- NY open watchlist: /api/movers every 5 minutes ----------
+    // US equity session, 9:30–16:00 New York time, Mon–Fri (exchange holidays not tracked).
+    function nyClock() {
+      const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' })
+        .formatToParts(new Date()).map((x) => [x.type, x.value]));
+      const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday);
+      const mins = Number(p.hour) * 60 + Number(p.minute), OPEN = 570, CLOSE = 960;
+      const weekday = day >= 1 && day <= 5;
+      if (weekday && mins >= OPEN && mins < CLOSE) return { open: true, left: CLOSE - mins };
+      let days = 0, d = day;
+      if (!(weekday && mins < OPEN)) { do { days++; d = (d + 1) % 7; } while (d === 0 || d === 6); }
+      return { open: false, left: days * 1440 + OPEN - mins };
+    }
+    const hm = (m) => (m >= 1440 ? `${Math.floor(m / 1440)}d ${Math.floor((m % 1440) / 60)}h` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`);
+    function tickClock() {
+      const c = nyClock(), el = $('#ny-clock');
+      el.textContent = c.open ? `OPEN · ${hm(c.left)} left` : `OPENS ${hm(c.left)}`;
+      el.title = c.open ? 'US market session is open (closes 4:00 PM ET)' : 'Time until the US market opens at 9:30 AM ET';
+      el.classList.toggle('open', c.open);
+    }
+    const pctCell = (v) => `<span class="mv-n ${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(v !== 0 && Math.abs(v) < 10 ? 2 : 1)}%</span>`;
+    function moverRows(list) {
+      return list.map((c) => `<li><a href="https://www.coingecko.com/en/coins/${encodeURIComponent(c.id)}" ${ext} title="${esc(c.name)} on CoinGecko">
+          <span class="sym">${c.image && /^https:\/\//.test(c.image) ? `<img src="${esc(c.image)}" alt="" loading="lazy" width="16" height="16">` : ''}<b>${esc(c.symbol)}</b><small>${esc(c.name)}</small></span>
+          <span class="mv-n px">${usd(c.price)}</span>${pctCell(c.change1h)}${pctCell(c.change24h)}</a></li>`).join('');
+    }
+    async function loadMovers() {
+      try {
+        const r = await fetch('/api/movers');
+        if (!r.ok) throw new Error(r.status);
+        const d = await r.json();
+        $('#mv-up').innerHTML = moverRows(d.gainers);
+        $('#mv-down').innerHTML = moverRows(d.losers);
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+          document.querySelectorAll('#movers .mv li').forEach((li, i) => setTimeout(() => li.classList.add('in'), (i % 5) * 60))));
+      } catch (err) {
+        console.warn('Movers failed', err);
+        $('#mv-up').innerHTML = $('#mv-down').innerHTML = '<li class="in"><p class="panel-note">Couldn’t load movers right now.</p></li>';
       }
     }
 
@@ -790,6 +882,10 @@
     startBeams();
     loadOnchain();
     setInterval(loadOnchain, 15 * 60 * 1000);
+    loadMovers();
+    setInterval(loadMovers, PRICE_INTERVAL);
+    tickClock();
+    setInterval(tickClock, 30 * 1000);
     feed.innerHTML = Array.from({ length: 5 }, () => '<div class="skeleton"></div>').join('');
     updateSavedCount();
     loadNews({ entrance: true });
