@@ -49,19 +49,6 @@ function feedHtml(stories) {
     </article>`).join('');
 }
 
-function blogStripHtml(posts) {
-  if (!posts.length) return '';
-  return `<section class="blog-strip" aria-labelledby="blog-strip-h">
-      <div class="blog-strip-h"><h2 id="blog-strip-h">From the BlockTalk blog</h2><a href="/blog">All market summaries →</a></div>
-      <div class="blog-cards">${posts.map((p) => `<a class="blog-card" href="/blog/${esc(p.slug)}">
-          ${p.has_image ? `<img src="/blog/${esc(p.slug)}/cover.png" alt="${esc(p.image_alt || p.title)}" width="1200" height="630" loading="lazy">` : ''}
-          <span class="blog-date"><time datetime="${esc(iso(p.published_at))}">${esc(longDate(p.published_at))}</time></span>
-          <b>${esc(p.title)}</b>
-          <span class="blog-ex">${esc(p.excerpt || p.meta_description)}</span>
-        </a>`).join('')}</div>
-    </section>`;
-}
-
 function homeJsonLd(data) {
   return ldScript({
     '@graph': [
@@ -78,11 +65,9 @@ function homeJsonLd(data) {
 
 async function home(res) {
   const html = await tpl('index.html');
-  const [news, posts] = await Promise.all([
-    getNews().catch((err) => { console.error('page: news unavailable', err.message); return null; }),
-    listPosts({ limit: 3 }).catch((err) => { console.error('page: blog unavailable', err.message); return []; }),
-  ]);
-  let out = html.replace('<!--SSR:BLOG-->', blogStripHtml(posts));
+  // Blog posts live only on /blog; the homepage links there from the nav.
+  const news = await getNews().catch((err) => { console.error('page: news unavailable', err.message); return null; });
+  let out = html;
   if (news?.stories?.length) {
     out = out
       .replace('<!--SSR:JSONLD-->', homeJsonLd(news))
