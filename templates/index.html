@@ -268,10 +268,17 @@
     .mv-n{text-align:right;white-space:nowrap}
     .mv-n.px{color:var(--text)}
     #movers .radar-h h2{font-size:12.5px}
-    .mv-session{display:flex;align-items:center;gap:7px;font:500 11px var(--font-mono);color:var(--muted);margin:-6px 0 12px}
-    .mv-session:before{content:'';width:6px;height:6px;border-radius:50%;background:var(--dim);flex:none}
-    .mv-session.open:before{background:var(--accent)}
-    .mv-session b{color:var(--text);font-weight:600}
+    .mv-session{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px 10px;padding:10px 12px;margin:-4px 0 14px;border:1px solid var(--line-2);border-radius:5px;background:var(--bg)}
+    .mv-badge{display:inline-flex;align-items:center;gap:6px;font:700 10px var(--font-mono);letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+    .mv-badge:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--dim)}
+    .mv-session.open .mv-badge{color:var(--accent)}
+    .mv-session.open .mv-badge:before{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .mv-when{justify-self:end;font:500 11px var(--font-mono);color:var(--muted);white-space:nowrap}
+    .mv-when b{color:var(--text);font-weight:700}
+    .mv-prog{grid-column:1 / -1;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+    .mv-prog i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .8s var(--ease)}
+    .mv-session:not(.open) .mv-prog i{background:var(--dim)}
+    .mv-ends{grid-column:1 / -1;display:flex;justify-content:space-between;margin-top:-4px;font:500 9.5px var(--font-mono);letter-spacing:.04em;color:var(--dim)}
     .digest .kicker{font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--t-defi);margin-bottom:8px}
     .digest h2{font-size:19px;line-height:1.25;margin-bottom:8px}
     .digest p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 12px}
@@ -432,8 +439,13 @@
             <p class="radar-src" id="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
           </div>
           <div class="panel" id="movers">
-            <div class="radar-h"><h2><svg class="i"><use href="#i-clock"/></svg>NY OPEN WATCHLIST</h2><span id="mv-updated" title="When these prices were fetched">—</span></div>
-            <p class="mv-session" id="ny-clock">—</p>
+            <div class="radar-h"><h2><svg class="i"><use href="#i-clock"/></svg>NY OPEN WATCHLIST</h2><span id="mv-updated" title="How old these prices are (refreshed every 5 minutes)">—</span></div>
+            <div class="mv-session" id="ny-clock" title="US stock market session: 9:30 AM – 4:00 PM New York time, Mon–Fri">
+              <span class="mv-badge" id="ny-badge">—</span>
+              <span class="mv-when" id="ny-when"></span>
+              <span class="mv-prog" aria-hidden="true"><i id="ny-prog"></i></span>
+              <span class="mv-ends" aria-hidden="true"><span>9:30 AM</span><span>4:00 PM ET</span></span>
+            </div>
             <div class="mv-h up"><svg class="i"><use href="#i-trend-up"/></svg>STRONGEST MOMENTUM</div>
             <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
             <ol class="mv" id="mv-up"></ol>
@@ -869,17 +881,19 @@
       if (!(weekday && mins < OPEN)) { do { days++; d = (d + 1) % 7; } while (d === 0 || d === 6); }
       return { open: false, left: days * 1440 + OPEN - mins };
     }
-    const hm = (m) => (m >= 1440 ? `${Math.floor(m / 1440)}d ${Math.floor((m % 1440) / 60)}h` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`);
+    const hm = (m) => (m >= 1440 ? `${Math.floor(m / 1440)}d ${Math.floor((m % 1440) / 60)}h` : m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m}m`);
     let moversAt = null;
     function tickClock() {
       const c = nyClock(), el = $('#ny-clock');
-      el.innerHTML = c.open
-        ? `US stock market <b>open</b> · closes 4:00 PM ET (in ${hm(c.left)})`
-        : `US stock market closed · opens 9:30 AM ET (in ${hm(c.left)})`;
       el.classList.toggle('open', c.open);
+      $('#ny-badge').textContent = c.open ? 'MARKET OPEN' : 'MARKET CLOSED';
+      $('#ny-when').innerHTML = c.open ? `Closes in <b>${hm(c.left)}</b>` : `Opens in <b>${hm(c.left)}</b>`;
+      // Session progress: share of the 6.5h regular session already elapsed (empty while closed).
+      const SESSION = 390;
+      $('#ny-prog').style.transform = `scaleX(${c.open ? Math.min(1, (SESSION - c.left) / SESSION).toFixed(3) : 0})`;
       if (moversAt) {
         const m = Math.floor((Date.now() - moversAt) / 60000);
-        $('#mv-updated').textContent = m < 1 ? 'UPDATED JUST NOW' : `UPDATED ${m}M AGO`;
+        $('#mv-updated').textContent = m < 1 ? 'PRICES · JUST NOW' : `PRICES · ${m}M AGO`;
       }
     }
     const pctCell = (v) => `<span class="mv-n ${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(v !== 0 && Math.abs(v) < 10 ? 2 : 1)}%</span>`;
