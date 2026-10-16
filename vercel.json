@@ -3,5 +3,29 @@
     { "path": "/api/cron/scrape?slot=13utc", "schedule": "0 13 * * *" },
     { "path": "/api/cron/scrape?slot=14utc", "schedule": "0 14 * * *" }
   ],
-  "functions": { "api/cron/scrape.js": { "maxDuration": 60 } }
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "blocktalk-ten.vercel.app" }],
+      "destination": "https://www.blocktalk.website/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/api/page" },
+    { "source": "/blog", "destination": "/api/page?view=blog" },
+    { "source": "/blog/:slug/cover.png", "destination": "/api/page?view=image&slug=:slug" },
+    { "source": "/blog/:slug", "destination": "/api/page?view=post&slug=:slug" },
+    { "source": "/sitemap.xml", "destination": "/api/page?view=sitemap" },
+    { "source": "/admin", "destination": "/api/page?view=admin" }
+  ],
+  "headers": [
+    { "source": "/api/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/templates/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }] },
+    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
+  ],
+  "functions": {
+    "api/cron/scrape.js": { "maxDuration": 60 },
+    "api/page.js": { "includeFiles": "templates/**" }
+  }
 }

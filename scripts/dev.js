@@ -1,23 +1,45 @@
 // Local preview without the Vercel CLI: `npm run dev` → http://localhost:3000
-// Serves index.html and routes /api/* to the same handlers Vercel runs.
+// Mirrors vercel.json: /api/* handlers, the page rewrites, and root static files.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 
-const routes = {
+const api = {
   '/api/news': () => import('../api/news.js'),
   '/api/prices': () => import('../api/prices.js'),
   '/api/onchain': () => import('../api/onchain.js'),
   '/api/movers': () => import('../api/movers.js'),
+  '/api/blog': () => import('../api/blog.js'),
+  '/api/page': () => import('../api/page.js'),
 };
+// Same rewrites as vercel.json → /api/page?view=…
+const rewrites = [
+  [/^\/$/, () => '/api/page'],
+  [/^\/blog\/?$/, () => '/api/page?view=blog'],
+  [/^\/blog\/([^/]+)\/cover\.png$/, (m) => `/api/page?view=image&slug=${m[1]}`],
+  [/^\/blog\/([^/]+)\/?$/, (m) => `/api/page?view=post&slug=${m[1]}`],
+  [/^\/sitemap\.xml$/, () => '/api/page?view=sitemap'],
+  [/^\/admin\/?$/, () => '/api/page?view=admin'],
+];
+const statics = { '/robots.txt': 'text/plain; charset=utf-8', '/favicon.svg': 'image/svg+xml' };
 
 http.createServer(async (req, res) => {
-  const path = new URL(req.url, 'http://x').pathname;
+  const url = new URL(req.url, 'http://x');
   res.status = (c) => { res.statusCode = c; return res; };
   res.json = (d) => { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(d)); };
-  if (routes[path]) return (await routes[path]()).default(req, res);
-  if (path === '/' || path === '/index.html') {
-    res.setHeader('content-type', 'text/html; charset=utf-8');
-    return res.end(await readFile(new URL('../index.html', import.meta.url)));
+  for (const [re, to] of rewrites) {
+    const m = url.pathname.match(re);
+    if (m) { req.url = to(m); break; }
   }
-  res.status(404).end('not found');
+  const path = new URL(req.url, 'http://x').pathname;
+  try {
+    if (api[path]) return await (await api[path]()).default(req, res);
+    if (statics[path]) {
+      res.setHeader('content-type', statics[path]);
+      return res.end(await readFile(new URL(`..${path}`, import.meta.url)));
+    }
+    res.status(404).end('not found');
+  } catch (err) {
+    console.error(err);
+    if (!res.headersSent) res.status(500).end('server error');
+  }
 }).listen(process.env.PORT || 3000, () => console.log(`BlockTalk on http://localhost:${process.env.PORT || 3000}`));

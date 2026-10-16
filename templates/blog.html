@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--SSR:HEAD-->
+  <meta name="theme-color" content="#0a0e0d" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!--SSR:GA-->
+  <style>
+    :root{
+      --bg:#0a0e0d;--grid:rgba(255,255,255,.028);--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;
+      --text:#e7ece8;--muted:#8d9892;--dim:#5e6964;
+      --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);
+      --font-display:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',ui-monospace,monospace;
+      --radius:6px;--ease:cubic-bezier(.2,0,0,1);
+    }
+    *{box-sizing:border-box}
+    html{color-scheme:dark}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased;
+      background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px;background-attachment:fixed}
+    a{color:inherit}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+    header.top{position:sticky;top:0;z-index:5;background:rgba(10,14,13,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .bar{height:62px;display:flex;align-items:center;gap:24px}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 17px var(--font-display);letter-spacing:.04em}
+    .logo-mark{width:30px;height:30px;border-radius:7px;background:var(--accent-soft);border:1px solid var(--accent-line);display:grid;place-items:center;color:var(--accent)}
+    .logo-mark svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .top nav{display:flex;gap:4px;font:600 12px var(--font-mono);margin-left:auto}
+    .top nav a{text-decoration:none;color:var(--muted);padding:8px 10px;border-radius:5px}
+    .top nav a:hover,.top nav a[aria-current]{color:var(--accent)}
+    main{padding:28px 0 70px}
+    .crumbs{font:500 11px var(--font-mono);color:var(--dim);margin-bottom:22px}.crumbs a{color:var(--muted);text-decoration:none}.crumbs a:hover{color:var(--accent)}
+    .eyebrow{font:600 12px var(--font-mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+    h1{font:700 clamp(28px,4vw,42px)/1.15 var(--font-display);letter-spacing:-.02em;margin:0}
+    h1 mark{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);border-radius:4px;padding:0 .18em}
+    .lede{color:var(--muted);font-size:16px;line-height:1.6;max-width:640px;margin:14px 0 0}
+    .blog-hero{margin-bottom:30px}
+    .post-list{display:grid;gap:14px}
+    .post-card{display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;transition:border-color .2s}
+    .post-card:hover{border-color:var(--accent-line)}
+    .post-card img{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:4px;background:var(--panel-2)}
+    .post-card time{font:600 11px var(--font-mono);color:var(--dim);letter-spacing:.04em}
+    .post-card h2{font:600 19px/1.3 var(--font-display);margin:6px 0 8px}.post-card h2 a{text-decoration:none}.post-card h2 a:hover{color:var(--accent)}
+    .post-card p{color:var(--muted);margin:0;font-size:14px;line-height:1.55}
+    .post{max-width:760px;margin:0 auto}
+    .post-meta{font:500 12px var(--font-mono);color:var(--dim);margin:12px 0 22px}
+    .cover{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:var(--radius);border:1px solid var(--line);margin-bottom:28px;background:var(--panel)}
+    .prose{font-size:17px;line-height:1.72;color:#d4dbd6}
+    .prose h2{font:700 24px/1.3 var(--font-display);color:var(--text);margin:36px 0 12px;letter-spacing:-.01em}
+    .prose h3{font:600 19px/1.35 var(--font-display);color:var(--text);margin:26px 0 8px}
+    .prose p{margin:0 0 16px}
+    .prose a{color:var(--accent);text-underline-offset:3px}
+    .prose strong{color:var(--text)}
+    .prose ul,.prose ol{padding-left:22px;margin:0 0 16px}.prose li{margin:4px 0}
+    .prose blockquote{margin:18px 0;padding:10px 16px;border-left:2px solid var(--accent);background:var(--panel);color:var(--muted)}
+    .prose table{width:100%;border-collapse:collapse;margin:16px 0 22px;font:500 13.5px var(--font-mono)}
+    .prose th,.prose td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+    .prose th{color:var(--muted);font-weight:600;background:var(--panel)}
+    .prose code{font:500 .9em var(--font-mono);background:var(--panel-2);padding:1px 5px;border-radius:3px}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin:26px 0 0}.tags span{font:600 11px var(--font-mono);color:var(--muted);border:1px solid var(--line-2);border-radius:4px;padding:3px 8px}
+    .disclaimer{font:500 11px var(--font-mono);color:var(--dim);margin:22px 0 0;line-height:1.6}
+    .back{margin-top:22px;font:600 13px var(--font-mono)}.back a{color:var(--accent);text-decoration:none}
+    .empty{color:var(--muted);font:13px var(--font-mono);padding:40px;border:1px dashed var(--line-2);border-radius:var(--radius);text-align:center}
+    footer{border-top:1px solid var(--line);padding:22px 0 30px;font:500 11px var(--font-mono);color:var(--dim)}
+    @media(max-width:720px){.wrap{padding:0 16px}.post-card{grid-template-columns:1fr}.prose{font-size:16px}.top nav a{padding:8px 6px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap bar">
+    <a class="logo" href="/"><span class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7l5 5-5 5M12 18h7"/></svg></span>BLOCKTALK</a>
+    <nav aria-label="Primary"><a href="/">Feed</a><a href="/blog" aria-current="page">Blog</a></nav>
+  </div></header>
+  <main class="wrap"><!--SSR:MAIN--></main>
+  <footer><div class="wrap">© 2026 BLOCKTALK · NOT FINANCIAL ADVICE</div></footer>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Blog review | BlockTalk</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0e0d;--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;--text:#e7ece8;--muted:#8d9892;--dim:#5e6964;
+      --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);--down:#f87171;
+      --font-display:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',ui-monospace,monospace}
+    *{box-sizing:border-box}html{color-scheme:dark}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display)}
+    button,input,textarea{font:inherit;color:inherit}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
+    h1{font:700 26px var(--font-display);margin:0 0 6px}
+    .sub{color:var(--muted);font:500 12px var(--font-mono);margin:0 0 22px}
+    .login{display:flex;gap:8px;margin-bottom:20px}
+    input,textarea{width:100%;background:var(--panel);border:1px solid var(--line-2);border-radius:5px;padding:10px;font:13px var(--font-mono)}
+    input:focus,textarea:focus{outline:none;border-color:var(--accent-line)}
+    button{border:1px solid var(--line-2);background:var(--panel-2);border-radius:5px;padding:9px 14px;font:700 12px var(--font-mono);cursor:pointer;white-space:nowrap}
+    button.pub{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+    button.rej{color:var(--down)}
+    button:disabled{opacity:.5;cursor:default}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:18px}
+    .card img{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:4px;border:1px solid var(--line);margin-bottom:14px}
+    label{display:block;font:600 10.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);margin:12px 0 5px;text-transform:uppercase}
+    label small{color:var(--dim);font-weight:500;text-transform:none;letter-spacing:0}
+    textarea{min-height:340px;line-height:1.55;resize:vertical}
+    .meta{font:500 11px var(--font-mono);color:var(--dim)}
+    .kw{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.kw span{font:600 10.5px var(--font-mono);border:1px solid var(--line-2);border-radius:3px;padding:2px 6px;color:var(--muted)}
+    .actions{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+    .actions input{flex:1;min-width:180px}
+    .msg{font:600 12px var(--font-mono);margin-top:10px}.msg.ok{color:var(--accent)}.msg.err{color:var(--down)}
+    .empty{color:var(--muted);font:13px var(--font-mono);padding:40px;border:1px dashed var(--line-2);border-radius:6px;text-align:center}
+    .bad{color:var(--down)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Blog review</h1>
+    <p class="sub">Drafts written by the daily Claude routine. Nothing appears on the site until you publish it.</p>
+    <form class="login" id="login"><input id="secret" type="password" placeholder="ADMIN_SECRET" autocomplete="current-password" aria-label="Admin secret"><button type="submit">Load drafts</button></form>
+    <div id="list"></div>
+  </div>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    let secret = '';
+    try { secret = sessionStorage.getItem('bt_admin') || ''; } catch {}
+    $('#secret').value = secret;
+
+    const counter = (el, min, max) => {
+      const out = el.parentElement.querySelector(`label[for="${el.id}"] small`);
+      const n = el.value.trim().length;
+      out.textContent = `${n} chars (target ${min}-${max})`;
+      out.classList.toggle('bad', n < min || n > max);
+    };
+
+    async function load() {
+      const r = await fetch('/api/blog?action=pending', { headers: { authorization: `Bearer ${secret}` } });
+      if (r.status === 401) { $('#list').innerHTML = '<p class="empty bad">Wrong secret.</p>'; return; }
+      const { posts } = await r.json();
+      if (!posts.length) { $('#list').innerHTML = '<p class="empty">No drafts waiting for review.</p>'; return; }
+      $('#list').innerHTML = posts.map((p) => `<div class="card" data-id="${p.id}">
+          ${p.image_base64 ? `<img src="data:${esc(p.image_mime)};base64,${esc(p.image_base64)}" alt="${esc(p.image_alt)}">` : '<p class="meta">No cover image.</p>'}
+          <p class="meta">Draft #${p.id} · created ${esc(new Date(p.created_at).toLocaleString())} · /blog/${esc(p.slug)}</p>
+          <div class="kw">${(p.keywords || []).map((k) => `<span>${esc(k)}</span>`).join('')}</div>
+          <label for="t${p.id}">Title <small></small></label><input id="t${p.id}" class="f-title" value="${esc(p.title)}">
+          <label for="m${p.id}">Meta description <small></small></label><input id="m${p.id}" class="f-meta" value="${esc(p.meta_description)}">
+          <label for="b${p.id}">Post (Markdown) <small></small></label><textarea id="b${p.id}" class="f-body">${esc(p.body_md)}</textarea>
+          <div class="actions"><input class="f-note" placeholder="Note (optional, saved with the decision)"><button class="pub" data-d="publish">Publish</button><button class="rej" data-d="reject">Reject</button></div>
+          <div class="msg" role="status"></div>
+        </div>`).join('');
+      document.querySelectorAll('.card').forEach((c) => {
+        const t = c.querySelector('.f-title'), m = c.querySelector('.f-meta'), b = c.querySelector('.f-body');
+        const upd = () => { counter(t, 20, 75); counter(m, 70, 170); counter(b, 600, 40000); };
+        [t, m, b].forEach((el) => el.addEventListener('input', upd)); upd();
+      });
+    }
+
+    $('#login').addEventListener('submit', (e) => {
+      e.preventDefault();
+      secret = $('#secret').value.trim();
+      try { sessionStorage.setItem('bt_admin', secret); } catch {}
+      load();
+    });
+
+    $('#list').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-d]');
+      if (!btn) return;
+      const card = btn.closest('.card'), msg = card.querySelector('.msg');
+      const decision = btn.dataset.d;
+      if (decision === 'reject' && !confirm('Reject this draft? It will not be published.')) return;
+      card.querySelectorAll('button').forEach((b) => (b.disabled = true));
+      const r = await fetch('/api/blog?action=review', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` },
+        body: JSON.stringify({ id: card.dataset.id, decision, title: card.querySelector('.f-title').value, meta_description: card.querySelector('.f-meta').value, body_md: card.querySelector('.f-body').value, note: card.querySelector('.f-note').value || null }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok) {
+        msg.className = 'msg ok';
+        msg.innerHTML = d.url ? `Published → <a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.url)}</a>` : 'Rejected.';
+      } else {
+        msg.className = 'msg err';
+        msg.textContent = d.error || `Failed (${r.status})`;
+        card.querySelectorAll('button').forEach((b) => (b.disabled = false));
+      }
+    });
+
+    if (secret) load();
+  </script>
+</body>
+</html>
