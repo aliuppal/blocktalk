@@ -21,7 +21,8 @@ const rewrites = [
   [/^\/sitemap\.xml$/, () => '/api/page?view=sitemap'],
   [/^\/admin\/?$/, () => '/api/page?view=admin'],
 ];
-const statics = { '/robots.txt': 'text/plain; charset=utf-8', '/favicon.svg': 'image/svg+xml' };
+// Only public/ is served as static files (vercel.json "outputDirectory"), same as production.
+const statics = { '/robots.txt': 'text/plain; charset=utf-8', '/favicon.svg': 'image/svg+xml', '/admin.js': 'text/javascript; charset=utf-8' };
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
@@ -36,7 +37,7 @@ http.createServer(async (req, res) => {
     if (api[path]) return await (await api[path]()).default(req, res);
     if (statics[path]) {
       res.setHeader('content-type', statics[path]);
-      return res.end(await readFile(new URL(`..${path}`, import.meta.url)));
+      return res.end(await readFile(new URL(`../public${path}`, import.meta.url)));
     }
     res.status(404).end('not found');
   } catch (err) {

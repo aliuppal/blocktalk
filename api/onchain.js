@@ -1,3 +1,4 @@
+import { rejectUnknownParams } from '../lib/http.js';
 // "On-chain radar" sidebar data. Every metric comes from a free public API and
 // is fetched independently, so one provider failing only blanks its own tile.
 // Cached at the CDN for 15 minutes.
@@ -40,6 +41,7 @@ async function bitcoin() {
 }
 
 export default async function handler(req, res) {
+  if (rejectUnknownParams(req, res)) return;
   const names = ['fng', 'ethBurn', 'l2', 'btc'];
   const results = await Promise.allSettled([fearGreed(), ethBurn(), l2Activity(), bitcoin()]);
   const body = { updated_at: new Date().toISOString() };

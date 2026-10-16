@@ -1,3 +1,4 @@
+import { rejectUnknownParams } from '../lib/http.js';
 import { sql } from '../lib/db.js';
 
 // News timeline: this week's high-impact ("red folder") economic events from the
@@ -26,6 +27,7 @@ async function fetchFeed() {
 }
 
 export default async function handler(req, res) {
+  if (rejectUnknownParams(req, res)) return;
   const db = sql();
   await db`create table if not exists calendar_cache (id int primary key, data jsonb not null, fetched_at timestamptz not null)`;
   const [cached] = await db`select data, fetched_at from calendar_cache where id = 1`;

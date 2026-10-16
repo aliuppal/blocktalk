@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { runDailyScrape } from '../../lib/scrape.js';
 
 // Runs once a day at 9 AM New York time. Vercel Cron only speaks UTC and
@@ -9,10 +10,11 @@ const nyHour = (d = new Date()) =>
   Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' }).format(d));
 
 export default async function handler(req, res) {
+  // Fail closed: without CRON_SECRET nothing can trigger a scrape (user-agents are spoofable).
   const secret = process.env.CRON_SECRET;
-  const authorized = secret
-    ? req.headers.authorization === `Bearer ${secret}`
-    : String(req.headers['user-agent'] ?? '').startsWith('vercel-cron');
+  const got = Buffer.from(String(req.headers.authorization ?? ''));
+  const want = Buffer.from(`Bearer ${secret ?? ''}`);
+  const authorized = Boolean(secret) && got.length === want.length && timingSafeEqual(got, want);
   if (!authorized) return res.status(401).json({ error: 'unauthorized' });
 
   // Scheduled calls carry ?slot=…; a manual call without it always runs.

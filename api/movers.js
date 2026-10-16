@@ -1,3 +1,4 @@
+import { rejectUnknownParams } from '../lib/http.js';
 // NY Open watchlist: the 5 strongest and 5 weakest coins in the top 100 by
 // market cap, ranked by recent momentum. This describes what is already moving,
 // not a forecast. Cached at the CDN for 5 minutes.
@@ -11,6 +12,7 @@ const SKIP = new Set([
 ]);
 
 export default async function handler(req, res) {
+  if (rejectUnknownParams(req, res)) return;
   try {
     const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&price_change_percentage=1h,24h', {
       headers: { accept: 'application/json' },

@@ -1,3 +1,4 @@
+import { rejectUnknownParams } from '../lib/http.js';
 // Live ticker data. CoinGecko is primary; Coinbase is the fallback for the
 // majors if CoinGecko rate-limits. Cached at the CDN for 5 minutes.
 const COINS = [
@@ -42,6 +43,7 @@ async function fromCoinbase() {
 }
 
 export default async function handler(req, res) {
+  if (rejectUnknownParams(req, res)) return;
   let data;
   try { data = await fromCoinGecko(); } catch (err) {
     console.warn('coingecko failed, using coinbase', err.message);
