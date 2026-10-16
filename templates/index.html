@@ -96,7 +96,7 @@
     .hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:end;padding:38px 0 26px}
     .eyebrow{font:600 12px var(--font-mono);color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
     h1,.as-h1{font:700 clamp(28px,3.6vw,40px)/1.15 var(--font-display);letter-spacing:-.025em;margin:0;max-width:760px}
-    h1 mark{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);border-radius:4px;padding:0 .18em}
+    h1 mark,.as-h1 mark{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);border-radius:4px;padding:0 .18em}
     .lede{color:var(--muted);font-size:15px;line-height:1.6;max-width:560px;margin:14px 0 0}
     .stats{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
     .stat{display:flex;align-items:center;gap:8px;font:600 10.5px var(--font-mono);letter-spacing:.06em;color:var(--muted);border:1px solid var(--line-2);background:var(--panel);padding:6px 10px;border-radius:4px;text-transform:uppercase}
@@ -268,8 +268,10 @@
     .mv-n{text-align:right;white-space:nowrap}
     .mv-n.px{color:var(--text)}
     #movers .radar-h h2{font-size:12.5px}
-    #ny-clock{font-size:10px}
-    #ny-clock.open{color:var(--accent)}
+    .mv-session{display:flex;align-items:center;gap:7px;font:500 11px var(--font-mono);color:var(--muted);margin:-6px 0 12px}
+    .mv-session:before{content:'';width:6px;height:6px;border-radius:50%;background:var(--dim);flex:none}
+    .mv-session.open:before{background:var(--accent)}
+    .mv-session b{color:var(--text);font-weight:600}
     .digest .kicker{font:700 11px var(--font-mono);letter-spacing:.08em;color:var(--t-defi);margin-bottom:8px}
     .digest h2{font-size:19px;line-height:1.25;margin-bottom:8px}
     .digest p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 12px}
@@ -294,6 +296,13 @@
     .impact i{width:7px;height:7px;border-radius:2px;background:currentColor}
     .asset{font:600 10.5px var(--font-mono);border:1px solid var(--line-2);color:var(--muted);padding:3px 6px;border-radius:3px}
     .note{color:var(--muted);font-size:12.5px}
+    .timeline-info a{color:var(--text)}
+    tr.past td{opacity:.45}
+    tr.next td{background:var(--accent-soft)}
+    .tl-status{display:inline-flex;align-items:center;gap:6px;font:700 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .tl-status i{width:7px;height:7px;border-radius:2px;background:var(--breaking)}
+    tr.next .tl-status{color:var(--accent)}tr.next .tl-status i{background:var(--accent)}
+    td.when small{display:block;font-weight:500;color:var(--dim);margin-top:2px}
     .timeline-info{padding:12px 16px;border-top:1px solid var(--line);font:500 11px var(--font-mono);color:var(--muted)}.timeline-info b{color:var(--breaking)}
 
     footer{border-top:1px solid var(--line);padding:22px 0 30px;font:500 11px var(--font-mono);color:var(--dim)}
@@ -423,7 +432,8 @@
             <p class="radar-src" id="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
           </div>
           <div class="panel" id="movers">
-            <div class="radar-h"><h2><svg class="i"><use href="#i-clock"/></svg>NY OPEN WATCHLIST</h2><span id="ny-clock">—</span></div>
+            <div class="radar-h"><h2><svg class="i"><use href="#i-clock"/></svg>NY OPEN WATCHLIST</h2><span id="mv-updated" title="When these prices were fetched">—</span></div>
+            <p class="mv-session" id="ny-clock">—</p>
             <div class="mv-h up"><svg class="i"><use href="#i-trend-up"/></svg>STRONGEST MOMENTUM</div>
             <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
             <ol class="mv" id="mv-up"></ol>
@@ -457,13 +467,13 @@
         <div>
           <div class="eyebrow"><svg class="i"><use href="#i-spark"/></svg>— High-impact crypto calendar</div>
           <h2 class="as-h1">News <mark>timeline</mark></h2>
-          <p class="lede">Only red-folder events: market-moving decisions, unlocks, upgrades and regulatory deadlines that may affect crypto markets.</p>
+          <p class="lede">Only red-folder events: this week’s high-impact economic releases and central-bank decisions that move crypto with the rest of risk markets. Updated live, shown in your local time.</p>
         </div>
       </section>
       <div class="timeline-card">
-        <div class="timeline-bar"><h2 id="timeline-title">This week</h2><div class="range-toggle"><button class="range active" data-range="week">Weekly</button><button class="range" data-range="month">Monthly</button></div></div>
-        <div class="tl-scroll"><table><thead><tr><th>Date &amp; time</th><th>Impact</th><th>Event</th><th>Asset</th><th>Watch</th></tr></thead><tbody id="timeline-events"></tbody></table></div>
-        <div class="timeline-info"><b>Red folder only:</b> low-impact updates are intentionally excluded.</div>
+        <div class="timeline-bar"><h2 id="timeline-title">This week</h2><div class="range-toggle"><button class="range active" data-range="upcoming">Upcoming</button><button class="range" data-range="week">Full week</button></div></div>
+        <div class="tl-scroll"><table><thead><tr><th>Date &amp; time</th><th>Status</th><th>Event</th><th>Currency</th><th>Forecast · Previous</th></tr></thead><tbody id="timeline-events"><tr><td colspan="5" class="note">Loading this week’s events…</td></tr></tbody></table></div>
+        <div class="timeline-info"><b>Red folder only:</b> high-impact events from the <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Forex Factory calendar</a>. Times in your local timezone. <span id="timeline-updated"></span></div>
       </div>
     </section>
   </main>
@@ -650,25 +660,44 @@
     }
 
     // ---------- views ----------
-    const timeline={week:[
-      ['Mon, Sep 22 · 14:00','US stablecoin bill committee vote','REGULATION','Watch BTC & stablecoins'],
-      ['Tue, Sep 23 · 13:30','US GDP revision & risk-assets reaction','MACRO','Watch BTC, ETH'],
-      ['Wed, Sep 24 · 18:00','Ethereum all-core developers call','ETH','Protocol roadmap updates'],
-      ['Thu, Sep 25 · 12:00','Major token unlock window','ALTCOINS','Supply-pressure watch'],
-      ['Fri, Sep 26 · 12:30','US PCE inflation release','MACRO','Volatility watch']
-    ],month:[
-      ['Sep 22 · 14:00','US stablecoin bill committee vote','REGULATION','Watch BTC & stablecoins'],
-      ['Sep 24 · 18:00','Ethereum all-core developers call','ETH','Protocol roadmap updates'],
-      ['Sep 26 · 12:30','US PCE inflation release','MACRO','Volatility watch'],
-      ['Oct 01 · 12:30','US jobs report release','MACRO','Risk-on / risk-off signal'],
-      ['Oct 08 · 18:00','Ethereum protocol call','ETH','Upgrade status check'],
-      ['Oct 15 · 14:00','US Federal Reserve policy decision','MACRO','Rates & liquidity watch'],
-      ['Oct 21 · 20:00','Bitcoin mining difficulty adjustment','BTC','Miner economics watch']
-    ]};
-    let timelineRange = 'week';
+    // News timeline: this week's high-impact events from /api/calendar (Forex Factory),
+    // refreshed every 30 minutes; statuses (released / next / upcoming) re-render every minute.
+    let timelineRange = 'upcoming', calendar = null, calendarAt = 0;
+    const localWhen = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const etWhen = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+    const shortDay = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+    const until = (ms) => { const m = Math.round(ms / 60000); return m < 60 ? `${m}m` : m < 1440 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${Math.floor(m / 1440)}d ${Math.floor((m % 1440) / 60)}h`; };
     function renderTimeline() {
-      $('#timeline-title').textContent = timelineRange === 'week' ? 'This week · Sep 21–27' : 'Monthly outlook · Sep 21–Oct 21';
-      $('#timeline-events').innerHTML = timeline[timelineRange].map((e) => `<tr><td class="when">${e[0]}</td><td><span class="impact"><i></i>HIGH</span></td><td><b>${e[1]}</b></td><td><span class="asset">${e[2]}</span></td><td class="note">${e[3]}</td></tr>`).join('');
+      const body = $('#timeline-events');
+      if (!calendar) return;
+      if (calendar.week_start) $('#timeline-title').textContent = `This week · ${shortDay.format(new Date(calendar.week_start))}–${shortDay.format(new Date(calendar.week_end))}`;
+      const now = Date.now();
+      const nextIdx = calendar.events.findIndex((e) => Date.parse(e.date) > now);
+      const rows = calendar.events.map((e, i) => ({ e, i, t: Date.parse(e.date) }))
+        .filter((r) => timelineRange === 'week' || r.t > now - 2 * 3600e3);   // "Upcoming" keeps the last 2h for context
+      body.innerHTML = rows.length ? rows.map(({ e, i, t }) => {
+        const past = t <= now, next = i === nextIdx;
+        const status = past ? 'Released' : next ? `Next · in ${until(t - now)}` : `In ${until(t - now)}`;
+        const fp = [e.forecast && `F: ${esc(e.forecast)}`, e.previous && `P: ${esc(e.previous)}`].filter(Boolean).join(' · ') || '—';
+        return `<tr class="${past ? 'past' : next ? 'next' : ''}"><td class="when">${esc(localWhen.format(new Date(t)))}<small>${esc(etWhen.format(new Date(t)))} ET</small></td>
+          <td><span class="tl-status"><i></i>${status}</span></td><td><b>${esc(e.title)}</b></td><td><span class="asset">${esc(e.country)}</span></td><td class="note">${fp}</td></tr>`;
+      }).join('') : '<tr><td colspan="5" class="note">No more high-impact events this week. Switch to “Full week” to see what was released.</td></tr>';
+      if (calendarAt) {
+        const m = Math.floor((now - calendarAt) / 60000);
+        $('#timeline-updated').textContent = `Updated ${m < 1 ? 'just now' : `${m}m ago`}.`;
+      }
+    }
+    async function loadCalendar() {
+      try {
+        const r = await fetch('/api/calendar');
+        if (!r.ok) throw new Error(r.status);
+        calendar = await r.json();
+        calendarAt = Date.parse(calendar.updated_at) || Date.now();
+        renderTimeline();
+      } catch (err) {
+        console.warn('Calendar failed', err);
+        if (!calendar) $('#timeline-events').innerHTML = '<tr><td colspan="5" class="note">Couldn’t load the calendar right now. It will retry shortly.</td></tr>';
+      }
     }
 
     function setView(next, { entrance = false } = {}) {
@@ -841,11 +870,17 @@
       return { open: false, left: days * 1440 + OPEN - mins };
     }
     const hm = (m) => (m >= 1440 ? `${Math.floor(m / 1440)}d ${Math.floor((m % 1440) / 60)}h` : `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`);
+    let moversAt = null;
     function tickClock() {
       const c = nyClock(), el = $('#ny-clock');
-      el.textContent = c.open ? `OPEN · ${hm(c.left)} left` : `OPENS ${hm(c.left)}`;
-      el.title = c.open ? 'US market session is open (closes 4:00 PM ET)' : 'Time until the US market opens at 9:30 AM ET';
+      el.innerHTML = c.open
+        ? `US stock market <b>open</b> · closes 4:00 PM ET (in ${hm(c.left)})`
+        : `US stock market closed · opens 9:30 AM ET (in ${hm(c.left)})`;
       el.classList.toggle('open', c.open);
+      if (moversAt) {
+        const m = Math.floor((Date.now() - moversAt) / 60000);
+        $('#mv-updated').textContent = m < 1 ? 'UPDATED JUST NOW' : `UPDATED ${m}M AGO`;
+      }
     }
     const pctCell = (v) => `<span class="mv-n ${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(v !== 0 && Math.abs(v) < 10 ? 2 : 1)}%</span>`;
     function moverRows(list) {
@@ -860,6 +895,8 @@
         const d = await r.json();
         $('#mv-up').innerHTML = moverRows(d.gainers);
         $('#mv-down').innerHTML = moverRows(d.losers);
+        moversAt = Date.parse(d.updated_at) || Date.now();
+        tickClock();
         requestAnimationFrame(() => requestAnimationFrame(() =>
           document.querySelectorAll('#movers .mv li').forEach((li, i) => setTimeout(() => li.classList.add('in'), (i % 5) * 60))));
       } catch (err) {
@@ -916,6 +953,9 @@
     setInterval(loadOnchain, 15 * 60 * 1000);
     loadMovers();
     setInterval(loadMovers, PRICE_INTERVAL);
+    loadCalendar();
+    setInterval(loadCalendar, 30 * 60 * 1000);
+    setInterval(renderTimeline, 60 * 1000);
     tickClock();
     setInterval(tickClock, 30 * 1000);
     updateSavedCount();

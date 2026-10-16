@@ -9,6 +9,7 @@ const api = {
   '/api/onchain': () => import('../api/onchain.js'),
   '/api/movers': () => import('../api/movers.js'),
   '/api/blog': () => import('../api/blog.js'),
+  '/api/calendar': () => import('../api/calendar.js'),
   '/api/page': () => import('../api/page.js'),
 };
 // Same rewrites as vercel.json → /api/page?view=…
