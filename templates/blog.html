@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>try{var t=localStorage.getItem('bt_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
   <!--SSR:HEAD-->
   <meta name="theme-color" content="#0a0e0d" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -16,17 +17,34 @@
       --bg:#0a0e0d;--grid:rgba(255,255,255,.028);--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;
       --text:#e7ece8;--muted:#8d9892;--dim:#5e6964;
       --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);
+      --prose:#d4dbd6;--header-bg:rgba(10,14,13,.86);
       --font-display:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',ui-monospace,monospace;
       --radius:6px;--ease:cubic-bezier(.2,0,0,1);
+      color-scheme:dark;
+    }
+    :root[data-theme="light"]{
+      --bg:#f5f7f5;--grid:rgba(15,40,25,.05);--panel:#ffffff;--panel-2:#f0f3f1;--line:#e0e6e2;--line-2:#cdd6d0;
+      --text:#17221c;--muted:#4f5d55;--dim:#76837b;
+      --accent:#15803d;--accent-ink:#ffffff;--accent-soft:rgba(21,128,61,.09);--accent-line:rgba(21,128,61,.34);
+      --prose:#243029;--header-bg:rgba(245,247,245,.9);color-scheme:light;
+    }
+    @media (prefers-color-scheme: light){
+      :root:not([data-theme="dark"]){
+        --bg:#f5f7f5;--grid:rgba(15,40,25,.05);--panel:#ffffff;--panel-2:#f0f3f1;--line:#e0e6e2;--line-2:#cdd6d0;
+        --text:#17221c;--muted:#4f5d55;--dim:#76837b;
+        --accent:#15803d;--accent-ink:#ffffff;--accent-soft:rgba(21,128,61,.09);--accent-line:rgba(21,128,61,.34);
+        --prose:#243029;--header-bg:rgba(245,247,245,.9);color-scheme:light;
+      }
     }
     *{box-sizing:border-box}
-    html{color-scheme:dark}
+    .theme-btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--panel);color:var(--muted);font:600 11px var(--font-mono);cursor:pointer}
+    .theme-btn:hover{color:var(--text)}
     body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased;
       background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px;background-attachment:fixed}
     a{color:inherit}
     :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
     .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
-    header.top{position:sticky;top:0;z-index:5;background:rgba(10,14,13,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    header.top{position:sticky;top:0;z-index:5;background:var(--header-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .bar{height:62px;display:flex;align-items:center;gap:24px}
     .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 17px var(--font-display);letter-spacing:.04em}
     .logo-mark{width:30px;height:30px;border-radius:7px;background:var(--accent-soft);border:1px solid var(--accent-line);display:grid;place-items:center;color:var(--accent)}
@@ -54,7 +72,7 @@
     .post{max-width:760px;margin:0 auto}
     .post-meta{font:500 12px var(--font-mono);color:var(--dim);margin:12px 0 22px}
     .cover{display:block;width:100%;height:auto;aspect-ratio:1200/630;border-radius:var(--radius);border:1px solid var(--line);margin-bottom:28px;background:var(--panel)}
-    .prose{font-size:17px;line-height:1.72;color:#d4dbd6}
+    .prose{font-size:17px;line-height:1.72;color:var(--prose)}
     .prose h2{font:700 24px/1.3 var(--font-display);color:var(--text);margin:36px 0 12px;letter-spacing:-.01em}
     .prose h3{font:600 19px/1.35 var(--font-display);color:var(--text);margin:26px 0 8px}
     .prose p{margin:0 0 16px}
@@ -78,8 +96,27 @@
   <header class="top"><div class="wrap bar">
     <a class="logo" href="/"><span class="logo-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7l5 5-5 5M12 18h7"/></svg></span>BLOCKTALK</a>
     <nav aria-label="Primary"><a href="/">Feed</a><a href="/blog" aria-current="page">Blog</a></nav>
+    <button class="theme-btn" id="theme-btn" type="button">Auto</button>
   </div></header>
   <main class="wrap"><!--SSR:MAIN--></main>
   <footer><div class="wrap">© 2026 BLOCKTALK · NOT FINANCIAL ADVICE</div></footer>
+  <script>
+    // Theme toggle (shared with the homepage): Auto (follows the OS) -> Light -> Dark.
+    (function () {
+      var btn = document.getElementById('theme-btn'), root = document.documentElement;
+      var mode = root.dataset.theme || 'auto';
+      function apply() {
+        if (mode === 'auto') delete root.dataset.theme; else root.dataset.theme = mode;
+        btn.textContent = mode === 'auto' ? 'Auto' : mode === 'light' ? 'Light' : 'Dark';
+        btn.setAttribute('aria-label', 'Theme: ' + (mode === 'auto' ? 'follows your system setting' : mode) + '. Click to change.');
+      }
+      btn.addEventListener('click', function () {
+        mode = mode === 'auto' ? 'light' : mode === 'light' ? 'dark' : 'auto';
+        try { mode === 'auto' ? localStorage.removeItem('bt_theme') : localStorage.setItem('bt_theme', mode); } catch (e) {}
+        apply();
+      });
+      apply();
+    })();
+  </script>
 </body>
 </html>

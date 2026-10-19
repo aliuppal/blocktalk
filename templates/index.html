@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>try{var t=localStorage.getItem('bt_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
   <title>Crypto News Ranked Across 12 Newsrooms | BlockTalk</title>
   <meta name="description" content="Today’s top crypto news from CoinDesk, The Block, Cointelegraph, Decrypt and 8 more outlets, merged by story and ranked by coverage, source and freshness." />
   <link rel="canonical" href="https://www.blocktalk.website/" />
@@ -25,17 +26,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Theme: dark by default, light when the OS prefers it, or forced with
+       <html data-theme="light|dark"> from the header toggle. */
     :root{
       --bg:#0a0e0d;--grid:rgba(255,255,255,.028);--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;
-      --text:#e7ece8;--muted:#8d9892;--dim:#5e6964;
+      --text:#e7ece8;--text-strong:#f7faf8;--muted:#8d9892;--dim:#5e6964;
       --accent:#4ade80;--accent-ink:#04200d;--accent-soft:rgba(74,222,128,.11);--accent-line:rgba(74,222,128,.38);
       --up:#4ade80;--down:#f87171;--breaking:#f87171;--breaking-soft:rgba(248,113,113,.12);
+      --up-soft:rgba(74,222,128,.12);--down-soft:rgba(248,113,113,.12);
       --t-markets:#4ade80;--t-defi:#38bdf8;--t-policy:#fbbf24;--t-bitcoin:#fb923c;--t-ethereum:#c4b5fd;--t-industry:#94a3b8;
+      --ticker-bg:#070a09;--header-bg:rgba(10,14,13,.86);--glow:rgba(74,222,128,.55);--sk:rgba(255,255,255,.06);--sk-shine:rgba(255,255,255,.05);
       --font-display:'Space Grotesk',system-ui,sans-serif;--font-mono:'JetBrains Mono',ui-monospace,monospace;
       --radius:6px;--ease:cubic-bezier(.2,0,0,1);
+      color-scheme:dark;
+    }
+    :root[data-theme="light"]{
+      --bg:#f5f7f5;--grid:rgba(15,40,25,.05);--panel:#ffffff;--panel-2:#f0f3f1;--line:#e0e6e2;--line-2:#cdd6d0;
+      --text:#17221c;--text-strong:#0a120d;--muted:#4f5d55;--dim:#76837b;
+      --accent:#15803d;--accent-ink:#ffffff;--accent-soft:rgba(21,128,61,.09);--accent-line:rgba(21,128,61,.34);
+      --up:#15803d;--down:#dc2626;--breaking:#dc2626;--breaking-soft:rgba(220,38,38,.07);
+      --up-soft:rgba(21,128,61,.09);--down-soft:rgba(220,38,38,.08);
+      --t-markets:#15803d;--t-defi:#0369a1;--t-policy:#b45309;--t-bitcoin:#c2410c;--t-ethereum:#6d28d9;--t-industry:#475569;
+      --ticker-bg:#eaefeb;--header-bg:rgba(245,247,245,.9);--glow:rgba(21,128,61,.3);--sk:rgba(15,40,25,.07);--sk-shine:rgba(255,255,255,.6);
+      color-scheme:light;
+    }
+    @media (prefers-color-scheme: light){
+      :root:not([data-theme="dark"]){
+        --bg:#f5f7f5;--grid:rgba(15,40,25,.05);--panel:#ffffff;--panel-2:#f0f3f1;--line:#e0e6e2;--line-2:#cdd6d0;
+        --text:#17221c;--text-strong:#0a120d;--muted:#4f5d55;--dim:#76837b;
+        --accent:#15803d;--accent-ink:#ffffff;--accent-soft:rgba(21,128,61,.09);--accent-line:rgba(21,128,61,.34);
+        --up:#15803d;--down:#dc2626;--breaking:#dc2626;--breaking-soft:rgba(220,38,38,.07);
+        --up-soft:rgba(21,128,61,.09);--down-soft:rgba(220,38,38,.08);
+        --t-markets:#15803d;--t-defi:#0369a1;--t-policy:#b45309;--t-bitcoin:#c2410c;--t-ethereum:#6d28d9;--t-industry:#475569;
+        --ticker-bg:#eaefeb;--header-bg:rgba(245,247,245,.9);--glow:rgba(21,128,61,.3);--sk:rgba(15,40,25,.07);--sk-shine:rgba(255,255,255,.6);
+        color-scheme:light;
+      }
     }
     *{box-sizing:border-box}
-    html{color-scheme:dark}
     body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased}
 
     /* ---- background grid + travelling beams ----
@@ -44,9 +71,9 @@
     .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
       background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
     .beam{position:absolute;left:0;top:0;opacity:0;will-change:transform,opacity}
-    .beam.h{width:var(--len);height:1px;background:linear-gradient(90deg,transparent,var(--accent));box-shadow:0 0 6px rgba(74,222,128,.55)}
+    .beam.h{width:var(--len);height:1px;background:linear-gradient(90deg,transparent,var(--accent));box-shadow:0 0 6px var(--glow)}
     .beam.h.rev{background:linear-gradient(270deg,transparent,var(--accent))}
-    .beam.v{width:1px;height:var(--len);background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 6px rgba(74,222,128,.55)}
+    .beam.v{width:1px;height:var(--len);background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 6px var(--glow)}
     .beam.v.rev{background:linear-gradient(0deg,transparent,var(--accent))}
     .ticker,main,footer{position:relative;z-index:1}
     button,input,select{font:inherit;color:inherit}
@@ -59,7 +86,7 @@
     svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
     /* ---- ticker ---- */
-    .ticker{height:34px;border-bottom:1px solid var(--line);background:#070a09;display:flex;align-items:center;font:500 11px var(--font-mono);letter-spacing:.02em}
+    .ticker{height:34px;border-bottom:1px solid var(--line);background:var(--ticker-bg);display:flex;align-items:center;font:500 11px var(--font-mono);letter-spacing:.02em}
     .live{display:flex;align-items:center;gap:6px;padding:3px 8px;margin:0 14px 0 max(16px,calc((100vw - 1240px)/2 + 24px));border:1px solid var(--accent-line);border-radius:4px;color:var(--accent);background:var(--accent-soft);flex:none;font-weight:700}
     .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);position:relative;flex:none}
     .dot:after{content:'';position:absolute;inset:0;border-radius:50%;background:inherit;animation:ping 2s var(--ease) infinite}
@@ -76,7 +103,7 @@
     .ticker-stats b{color:var(--text);font-weight:600}.ticker-stats .sync{display:flex;align-items:center;gap:6px;color:var(--accent)}
 
     /* ---- header ---- */
-    header{position:sticky;top:0;z-index:20;background:rgba(10,14,13,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    header{position:sticky;top:0;z-index:20;background:var(--header-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
     .bar{height:62px;display:flex;align-items:center;gap:28px}
     .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 17px var(--font-display);letter-spacing:.04em}
     .logo-mark{width:30px;height:30px;border-radius:7px;background:var(--accent-soft);border:1px solid var(--accent-line);display:grid;place-items:center;color:var(--accent)}
@@ -93,6 +120,9 @@
     .search input{flex:1;min-width:0;background:none;border:0;outline:0;font:12px var(--font-mono);color:var(--text)}
     .search input::placeholder{color:var(--dim)}
     kbd{font:600 10px var(--font-mono);color:var(--dim);border:1px solid var(--line-2);border-radius:3px;padding:1px 5px}
+    .theme-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--panel);color:var(--muted);font:600 11px var(--font-mono);white-space:nowrap;transition:color .15s,border-color .15s}
+    .theme-btn:hover{color:var(--text);border-color:var(--dim)}
+    .theme-btn svg{width:15px;height:15px}
 
     /* ---- hero ---- */
     .hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:end;padding:38px 0 26px}
@@ -123,7 +153,7 @@
 
     /* ---- story card ---- */
     .story{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 62px;gap:14px;padding:16px 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);transition:border-color .2s}
-    .story:before{content:'';position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 0 1px var(--accent-line),0 12px 32px -14px rgba(74,222,128,.28);opacity:0;transition:opacity .25s ease;pointer-events:none}
+    .story:before{content:'';position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 0 1px var(--accent-line),0 12px 32px -14px var(--glow);opacity:0;transition:opacity .25s ease;pointer-events:none}
     .story:hover:before{opacity:1}
     .num{font:600 14px var(--font-mono);color:var(--dim);padding-top:2px}
     .badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px;font:600 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
@@ -131,9 +161,13 @@
     .badge.breaking{color:var(--breaking);background:var(--breaking-soft)}
     .badge.breaking i{width:5px;height:5px;border-radius:50%;background:currentColor}
     .tag-Markets{color:var(--t-markets)}.tag-DeFi{color:var(--t-defi)}.tag-Policy{color:var(--t-policy)}.tag-Bitcoin{color:var(--t-bitcoin)}.tag-Ethereum{color:var(--t-ethereum)}.tag-Industry{color:var(--t-industry)}
-    .tone{display:inline-flex;align-items:center;gap:4px}
+    /* Headline tone: soft pill, arrow + label, readable at a glance. */
+    .tone{display:inline-flex;align-items:center;gap:4px;padding:3px 8px 3px 6px;border-radius:999px;letter-spacing:.04em}
+    .tone b{font-size:11px;line-height:1}
+    .tone.up{color:var(--up);background:var(--up-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--up) 30%,transparent)}
+    .tone.down{color:var(--down);background:var(--down-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--down) 30%,transparent)}
     .sep{color:var(--line-2)}
-    .story h2{font:600 16.5px/1.38 var(--font-display);letter-spacing:-.01em;margin:0 0 6px}
+    .story h2{font:700 16.5px/1.38 var(--font-display);letter-spacing:-.012em;margin:0 0 6px;color:var(--text-strong)}
     .story h2 a{text-decoration:none}
     .story h2 a:hover{text-decoration:underline;text-decoration-color:var(--accent-line);text-underline-offset:3px}
     .story h2 .arrow{display:inline-block;margin-left:4px;color:var(--accent);opacity:0;transform:translate(-4px,2px);transition:transform .2s var(--ease),opacity .2s}
@@ -143,13 +177,25 @@
     .meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font:500 11px var(--font-mono);color:var(--dim)}
     .meta .m{display:inline-flex;align-items:center;gap:5px}
     .meta b{color:var(--muted);font-weight:600}
-    .meta .src{color:var(--accent);font-weight:600}
-    .save{margin-left:auto;display:inline-flex;align-items:center;gap:5px;background:none;border:0;color:var(--dim);font:600 11px var(--font-mono);padding:2px 0;transition:color .15s}
-    .save:hover{color:var(--text)}.save.on{color:var(--accent)}.save.on svg{fill:currentColor}
-    .also{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
-    .also small{font:600 10px var(--font-mono);color:var(--dim);letter-spacing:.06em;margin-right:2px}
-    .also a{font:600 11px var(--font-mono);text-decoration:none;color:var(--muted);border:1px solid var(--line-2);border-radius:4px;padding:3px 8px;transition:color .15s,border-color .15s,transform .15s var(--ease)}
-    .also a:hover{color:var(--accent);border-color:var(--accent-line);transform:translateY(-1px)}
+    /* Source line: favicon + outlet name, smaller and muted so the headline leads. */
+    .fav{width:14px;height:14px;border-radius:3px;flex:none;background:var(--panel-2)}
+    .meta .src{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
+    .meta .rank{color:var(--dim)}
+    .also{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:10px}
+    .also small{font:600 9.5px var(--font-mono);color:var(--dim);letter-spacing:.06em;margin-right:3px}
+    .also a{display:inline-flex;align-items:center;gap:5px;font:500 10.5px var(--font-mono);text-decoration:none;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;transition:color .15s,border-color .15s,transform .15s var(--ease)}
+    .also a .fav{width:12px;height:12px;border-radius:50%}
+    .also a:hover{color:var(--text);border-color:var(--line-2);transform:translateY(-1px)}
+    /* Score column: upvote button + "SCORE (?)" label with a shared tooltip. */
+    .vote-col{display:flex;flex-direction:column;align-items:center;gap:5px;align-self:start}
+    .score-lbl{display:inline-flex;align-items:center;gap:4px;font:600 8.5px var(--font-mono);letter-spacing:.1em;color:var(--dim)}
+    .help{display:inline-grid;place-items:center;width:14px;height:14px;padding:0;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--muted);font:700 9px var(--font-mono);letter-spacing:0;cursor:help}
+    .help:hover,.help:focus-visible,.help[aria-expanded="true"]{color:var(--text);border-color:var(--dim)}
+    .tip{position:fixed;z-index:50;width:260px;padding:12px 14px;border-radius:6px;background:var(--panel);border:1px solid var(--line-2);box-shadow:0 12px 32px -12px rgba(0,0,0,.45);font:500 11.5px/1.55 var(--font-mono);color:var(--muted);opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s,transform .15s var(--ease)}
+    .tip.show{opacity:1;transform:none}
+    .tip b{color:var(--text)}
+    .tip ul{margin:6px 0 6px;padding-left:16px}.tip li{margin:2px 0}
+    .tip small{display:block;color:var(--dim);margin-top:4px}
     .vote{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;align-self:start;width:62px;padding:9px 0 8px;border:1px solid var(--line-2);border-radius:5px;background:var(--panel-2);color:var(--muted);transition:border-color .15s,color .15s,transform .15s var(--ease)}
     .vote:hover{border-color:var(--accent-line);color:var(--accent)}
     .vote:active{transform:scale(.94)}
@@ -159,7 +205,7 @@
     .vote b{font:700 13px var(--font-mono);color:var(--text)}
     .vote small{font:600 8.5px var(--font-mono);letter-spacing:.1em;color:var(--dim)}
 
-    .story.featured{grid-template-columns:minmax(0,1fr) 70px;padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,rgba(74,222,128,.06),transparent 60%),var(--panel)}
+    .story.featured{grid-template-columns:minmax(0,1fr) 70px;padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),transparent 60%),var(--panel)}
     .story.featured .num{display:none}
     .story.featured h2{font-size:21px;line-height:1.3}
     .story.featured .summary{font-size:14px}
@@ -171,8 +217,12 @@
     .empty,.error{padding:48px 24px;text-align:center;color:var(--muted);font:13px var(--font-mono);border:1px dashed var(--line-2);border-radius:var(--radius)}
     .error button{margin-top:14px;border:1px solid var(--line-2);background:var(--panel);border-radius:5px;padding:8px 14px;font:600 12px var(--font-mono)}
     .skeleton{height:120px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);position:relative;overflow:hidden}
-    .skeleton:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);transform:translateX(-100%);animation:shimmer 1.3s infinite}
+    .skeleton:after,.sk:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--sk-shine),transparent);transform:translateX(-100%);animation:shimmer 1.3s infinite}
     @keyframes shimmer{to{transform:translateX(100%)}}
+    /* Inline skeleton blocks: reserve the space real data will take (no layout shift). */
+    .sk{display:inline-block;position:relative;overflow:hidden;vertical-align:middle;height:.9em;width:var(--w,60px);border-radius:3px;background:var(--sk);color:transparent}
+    .sk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 6px}
+    .sk-row .sk:first-child{--w:46%}.sk-row .sk:last-child{--w:22%}
 
     .story.enter{animation:rise .5s var(--ease) both;animation-delay:calc(var(--i) * 35ms)}
     @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -278,7 +328,8 @@
     .timeline-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
     .timeline-bar h2{margin:0;font:600 15px var(--font-display)}
     .range-toggle{display:flex;gap:4px}
-    .range-toggle button{border:1px solid var(--line-2);background:transparent;color:var(--muted);padding:6px 10px;border-radius:4px;font:600 11px var(--font-mono)}
+    .range-toggle button{border:1px solid var(--line-2);background:transparent;color:var(--muted);padding:6px 10px;border-radius:4px;font:600 11px var(--font-mono);white-space:nowrap}
+    @media(max-width:720px){.timeline-bar{flex-wrap:wrap;gap:10px}}
     .range-toggle button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
     .tl-scroll{overflow-x:auto}
     table{width:100%;border-collapse:collapse;min-width:640px}
@@ -297,6 +348,24 @@
     tr.next .tl-status{color:var(--accent)}tr.next .tl-status i{background:var(--accent)}
     td.when small{display:block;font-weight:500;color:var(--dim);margin-top:2px}
     .timeline-info{padding:12px 16px;border-top:1px solid var(--line);font:500 11px var(--font-mono);color:var(--muted)}.timeline-info b{color:var(--breaking)}
+    /* Phones: each event becomes a stacked card instead of a wide table row. */
+    @media(max-width:720px){
+      .tl-scroll{overflow:visible}
+      table,tbody,tr,td{display:block;width:100%;min-width:0}
+      thead{display:none}
+      tr{padding:12px 14px;border-top:1px solid var(--line)}
+      tr.next{background:var(--accent-soft)}
+      tr.next td{background:none}
+      td{border:0;padding:3px 0}
+      td[data-label]:not(.when):not(.tl-st):before{content:attr(data-label);display:block;font:600 9.5px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:1px}
+      td.when{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+      td.when small{display:inline;margin:0}
+      td.tl-st{padding-bottom:6px}
+      td.ev b{font-size:15px}
+      td.cur{display:inline-block;width:auto;margin-right:10px}
+      td.fp{display:inline-block;width:auto}
+      td.fp:before{display:none!important}
+    }
 
     footer{border-top:1px solid var(--line);padding:22px 0 30px;font:500 11px var(--font-mono);color:var(--dim)}
     footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -319,6 +388,7 @@
       .vote{width:54px}.story.featured{grid-template-columns:minmax(0,1fr) 54px}.story.featured .vote{width:54px}
       .story.featured h2{font-size:18px}
       kbd{display:none}.meta .dom{display:none}
+      .theme-btn{order:2;padding:0 9px}.theme-btn span{display:none}
     }
     @media(prefers-reduced-motion:reduce){
       *,*:before,*:after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}
@@ -328,11 +398,14 @@
 </head>
 <body>
   <div class="bg" aria-hidden="true" id="bg"></div>
+  <div class="tip" id="score-tip" role="tooltip"><b>How SCORE works</b><ul><li><b>Coverage</b>: +30 for each other outlet running the story (max +180)</li><li><b>Source authority</b>: 40–80 by outlet</li><li><b>Freshness</b>: up to +100, halves every 18h</li><li><b>Trending topics</b>: up to +40</li><li><b>Your upvote</b>: +25 (this browser only)</li></ul><small>Re-ranked daily from 12 newsrooms.</small></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></symbol>
     <symbol id="i-term" viewBox="0 0 24 24"><path d="M5 7l5 5-5 5M12 18h7"/></symbol>
-    <symbol id="i-save" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></symbol>
     <symbol id="i-trend-up" viewBox="0 0 24 24"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></symbol>
     <symbol id="i-trend-down" viewBox="0 0 24 24"><path d="M4 8l5 5 4-4 7 7"/><path d="M15 16h5v-5"/></symbol>
@@ -344,7 +417,7 @@
 
   <div class="ticker" aria-label="Live crypto prices">
     <span class="live"><span class="dot"></span>LIVE MKT</span>
-    <div class="ticker-viewport"><div class="ticker-track" id="ticker-track"><span class="tk">Loading prices…</span></div></div>
+    <div class="ticker-viewport"><div class="ticker-track" id="ticker-track" aria-busy="true"><span class="tk"><span class="sk" style="--w:150px"></span></span><span class="tk"><span class="sk" style="--w:150px"></span></span><span class="tk"><span class="sk" style="--w:150px"></span></span><span class="tk"><span class="sk" style="--w:150px"></span></span><span class="tk"><span class="sk" style="--w:150px"></span></span><span class="tk"><span class="sk" style="--w:150px"></span></span></div></div>
     <div class="ticker-stats" id="ticker-stats"></div>
   </div>
 
@@ -355,11 +428,11 @@
         <a class="active" data-view="top" href="#top">Feed</a>
         <a data-view="latest" href="#latest">Latest</a>
         <a data-view="covered" href="#covered">Most covered</a>
-        <a data-view="saved" href="#saved">Saved<span class="count" id="saved-count"></span></a>
         <a data-view="timeline" href="#timeline">Timeline</a>
         <a href="/blog">Blog</a>
       </nav>
       <label class="search"><svg class="i"><use href="#i-search"/></svg><span class="sr">Search stories</span><input id="q" type="search" placeholder="Search stories, sources…" autocomplete="off"><kbd>/</kbd></label>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: follows your system setting"><svg class="i"><use href="#i-auto"/></svg><span>Auto</span></button>
     </div>
   </header>
 
@@ -404,7 +477,7 @@
             <div class="radar-h"><h2><svg class="i"><use href="#i-radar"/></svg>ON-CHAIN RADAR</h2><span id="radar-age">LIVE FEED</span></div>
             <div class="fng">
               <div class="fng-top"><span>CRYPTO FEAR &amp; GREED</span><b id="fng-val">— <small>/ 100</small></b></div>
-              <div class="fng-now" id="fng-label">—</div>
+              <div class="fng-now" id="fng-label"><span class="sk" style="--w:45%"></span></div>
               <div class="fng-bar" role="img" id="fng-bar" aria-label="Fear and Greed index"><i></i><i></i><i></i><i></i><i></i><span class="fng-track" id="fng-track"></span></div>
               <div class="fng-legend"><span>Extreme Fear</span><span>Extreme Greed</span></div>
             </div>
@@ -416,10 +489,10 @@
               <div class="mood-why" id="mood-why"></div>
             </div>
             <div class="tiles">
-              <div class="tile"><small>ETH burn (24h)</small><b id="t-burn">—</b><em id="t-burn-d">—</em></div>
-              <div class="tile l2"><small>L2 TPS aggregate</small><b id="t-l2">—</b><em id="t-l2-d">—</em></div>
-              <div class="tile btc"><small>BTC hashrate</small><b id="t-hash">—</b><em id="t-hash-d">—</em></div>
-              <div class="tile"><small>BTC next-block fee</small><b id="t-fee">—</b><em id="t-fee-d">—</em></div>
+              <div class="tile"><small>ETH burn (24h)</small><b id="t-burn"><span class="sk" style="--w:70%"></span></b><em id="t-burn-d"><span class="sk" style="--w:55%"></span></em></div>
+              <div class="tile l2"><small>L2 TPS aggregate</small><b id="t-l2"><span class="sk" style="--w:70%"></span></b><em id="t-l2-d"><span class="sk" style="--w:55%"></span></em></div>
+              <div class="tile btc"><small>BTC hashrate</small><b id="t-hash"><span class="sk" style="--w:70%"></span></b><em id="t-hash-d"><span class="sk" style="--w:55%"></span></em></div>
+              <div class="tile"><small>BTC next-block fee</small><b id="t-fee"><span class="sk" style="--w:70%"></span></b><em id="t-fee-d"><span class="sk" style="--w:55%"></span></em></div>
             </div>
             <p class="radar-src" id="radar-src">Data: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">alternative.me</a> · <a href="https://ultrasound.money" target="_blank" rel="noopener noreferrer">ultrasound.money</a> · <a href="https://l2beat.com/scaling/activity" target="_blank" rel="noopener noreferrer">L2BEAT</a> · <a href="https://mempool.space" target="_blank" rel="noopener noreferrer">mempool.space</a></p>
           </div>
@@ -433,10 +506,10 @@
             </div>
             <div class="mv-h up"><svg class="i"><use href="#i-trend-up"/></svg>STRONGEST MOMENTUM</div>
             <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
-            <ol class="mv" id="mv-up"></ol>
+            <ol class="mv" id="mv-up" aria-busy="true"><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li></ol>
             <div class="mv-h down"><svg class="i"><use href="#i-trend-down"/></svg>WEAKEST MOMENTUM</div>
             <div class="mv-cols"><span>COIN</span><span>PRICE</span><span>1H</span><span>24H</span></div>
-            <ol class="mv" id="mv-down"></ol>
+            <ol class="mv" id="mv-down" aria-busy="true"><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li><li class="in"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></li></ol>
             <p class="radar-src">Top 100 coins by market cap, ranked by 24h change plus 2× the last hour. Shows what’s already moving into the 9:30 AM ET open, not a forecast. Not financial advice. Data: <a href="https://www.coingecko.com" target="_blank" rel="noopener noreferrer">CoinGecko</a></p>
           </div>
           <div class="panel">
@@ -469,7 +542,7 @@
       </section>
       <div class="timeline-card">
         <div class="timeline-bar"><h2 id="timeline-title">This week</h2><div class="range-toggle"><button class="range active" data-range="upcoming">Upcoming</button><button class="range" data-range="week">Full week</button></div></div>
-        <div class="tl-scroll"><table><thead><tr><th>Date &amp; time</th><th>Status</th><th>Event</th><th>Currency</th><th>Forecast · Previous</th></tr></thead><tbody id="timeline-events"><tr><td colspan="5" class="note">Loading this week’s events…</td></tr></tbody></table></div>
+        <div class="tl-scroll"><table><thead><tr><th>Date &amp; time</th><th>Status</th><th>Event</th><th>Currency</th><th>Forecast · Previous</th></tr></thead><tbody id="timeline-events" aria-busy="true"><tr><td colspan="5"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></td></tr><tr><td colspan="5"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></td></tr><tr><td colspan="5"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></td></tr><tr><td colspan="5"><div class="sk-row"><span class="sk"></span><span class="sk"></span></div></td></tr></tbody></table></div>
         <div class="timeline-info"><b>Red folder only:</b> high-impact events from the <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Forex Factory calendar</a>. Times in your local timezone. <span id="timeline-updated"></span></div>
       </div>
     </section>
@@ -508,17 +581,16 @@
     // ---------- state ----------
     let stories = [], sources = [], filter = 'top', view = 'top', sort = 'rank', query = '';
     let voted = new Set(store.get('blocktalk_votes', []));
-    let saved = new Map(store.get('blocktalk_saved', []).map((s) => [s.url, s]));
     const feed = $('#feed');
+    // Outlet favicons (Google's favicon service); hidden if they fail to load.
+    const fav = (domain, size = 14) => domain ? `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32" alt="" width="${size}" height="${size}" loading="lazy" onerror="this.remove()">` : '';
     const rankScore = (s) => s.score + (voted.has(s.url) ? 25 : 0);
 
     function visibleStories() {
-      let list = view === 'saved' ? [...saved.values()] : [...stories];
-      if (view !== 'saved') {
-        if (filter === 'breaking') list = list.filter((s) => ageH(s.published_at) < BREAKING_H);
-        else if (['markets', 'defi', 'policy'].includes(filter)) list = list.filter((s) => s.kind === filter);
-        else if (['bitcoin', 'ethereum'].includes(filter)) list = list.filter((s) => s.tag.toLowerCase() === filter || new RegExp(filter === 'bitcoin' ? '\\b(bitcoin|btc)\\b' : '\\b(ethereum|eth|ether)\\b', 'i').test(s.title));
-      }
+      let list = [...stories];
+      if (filter === 'breaking') list = list.filter((s) => ageH(s.published_at) < BREAKING_H);
+      else if (['markets', 'defi', 'policy'].includes(filter)) list = list.filter((s) => s.kind === filter);
+      else if (['bitcoin', 'ethereum'].includes(filter)) list = list.filter((s) => s.tag.toLowerCase() === filter || new RegExp(filter === 'bitcoin' ? '\\b(bitcoin|btc)\\b' : '\\b(ethereum|eth|ether)\\b', 'i').test(s.title));
       if (query) {
         const q = query.toLowerCase();
         list = list.filter((s) => `${s.title} ${s.summary || ''} ${s.source} ${(s.also || []).map((a) => a.source).join(' ')}`.toLowerCase().includes(q));
@@ -532,9 +604,8 @@
     function storyHtml(s, i, featured) {
       const t = tone(s.title);
       const fresh = ageH(s.published_at) < BREAKING_H;
-      const also = s.also?.length ? `<div class="also"><small>ALSO ON</small>${s.also.map((a) => `<a href="${esc(safeUrl(a.url))}" ${ext}>${esc(a.source)}</a>`).join('')}</div>` : '';
+      const also = s.also?.length ? `<div class="also"><small>ALSO ON</small>${s.also.map((a) => `<a href="${esc(safeUrl(a.url))}" ${ext}>${fav(a.domain, 12)}${esc(a.source)}</a>`).join('')}</div>` : '';
       const pts = Math.round(rankScore(s));
-      const isSaved = saved.has(s.url);
       return `<article class="story${featured ? ' featured' : ''}" data-key="${esc(s.url)}" style="--i:${Math.min(i, 14)}">
         <div class="num">${String(i + 1).padStart(2, '0')}</div>
         <div class="body">
@@ -542,19 +613,21 @@
             ${fresh ? '<span class="badge breaking"><i></i>Breaking</span>' : ''}
             <span class="badge tag-${esc(s.tag)}">${esc(s.tag)}</span>
             <span>${esc(ago(s.published_at))}</span>
-            ${t ? `<span class="sep">·</span><span class="tone ${t === 'bull' ? 'up' : 'down'}">${icon(t === 'bull' ? 'trend-up' : 'trend-down')}${t === 'bull' ? 'Bullish' : 'Bearish'} tone</span>` : ''}
+            ${t ? `<span class="tone ${t === 'bull' ? 'up' : 'down'}" title="Tone of the headline wording, not a price prediction"><b aria-hidden="true">${t === 'bull' ? '↑' : '↓'}</b>${t === 'bull' ? 'Bullish' : 'Bearish'}</span>` : ''}
           </div>
           <h2><a href="${esc(safeUrl(s.url))}" ${ext}>${esc(s.title)}<span class="arrow" aria-hidden="true">↗</span></a></h2>
           ${s.summary ? `<p class="summary">${esc(s.summary)}</p>` : ''}
           <div class="meta">
-            <span class="m"><span class="src">${esc(s.source)}</span>${s.source_rank ? `<span>#${esc(s.source_rank)}</span>` : ''}</span>
+            <span class="m"><span class="src">${fav(s.domain)}${esc(s.source)}</span>${s.source_rank ? `<span class="rank" title="Source ranking">#${esc(s.source_rank)}</span>` : ''}</span>
             <span class="m">${icon('layers')}<b>${s.coverage} outlet${s.coverage > 1 ? 's' : ''}</b></span>
             <span class="m dom">${esc(s.domain)}</span>
-            <button class="save${isSaved ? ' on' : ''}" data-save="${esc(s.url)}" aria-pressed="${isSaved}">${icon('save')}${isSaved ? 'Saved' : 'Save'}</button>
           </div>
           ${also}
         </div>
-        <button class="vote${voted.has(s.url) ? ' on' : ''}" data-vote="${esc(s.url)}" aria-pressed="${voted.has(s.url)}" aria-label="Upvote, score ${pts}">${icon('up')}<b>${pts}</b><small>SCORE</small></button>
+        <div class="vote-col">
+          <button class="vote${voted.has(s.url) ? ' on' : ''}" data-vote="${esc(s.url)}" aria-pressed="${voted.has(s.url)}" aria-label="Upvote, score ${pts}">${icon('up')}<b>${pts}</b></button>
+          <span class="score-lbl">SCORE<button type="button" class="help" aria-label="How the score is calculated" aria-describedby="score-tip" aria-expanded="false">?</button></span>
+        </div>
       </article>`;
     }
 
@@ -568,7 +641,7 @@
       const featureFirst = view === 'top' && filter === 'top' && sort === 'rank' && !query;
       feed.innerHTML = list.length
         ? list.map((s, i) => storyHtml(s, i, featureFirst && i === 0)).join('')
-        : `<div class="empty">${view === 'saved' ? 'Nothing saved yet. Use “Save” on any story to keep it here.' : query ? `No stories match “${esc(query)}”.` : 'No stories in this category right now.'}</div>`;
+        : `<div class="empty">${query ? `No stories match “${esc(query)}”.` : 'No stories in this category right now.'}</div>`;
       if (reduceMotion) return;
 
       const rows = [...feed.querySelectorAll('.story')];
@@ -584,26 +657,41 @@
       });
     }
 
-    function updateSavedCount() { $('#saved-count').textContent = saved.size ? saved.size : ''; }
-
     feed.addEventListener('click', (e) => {
       const vote = e.target.closest('[data-vote]');
-      const save = e.target.closest('[data-save]');
-      if (vote) {
-        const url = vote.dataset.vote;
-        voted.has(url) ? voted.delete(url) : voted.add(url);
-        store.set('blocktalk_votes', [...voted]);
-        render();
-        feed.querySelector(`[data-vote="${CSS.escape(url)}"]`)?.classList.add('pop');
-      } else if (save) {
-        const url = save.dataset.save;
-        if (saved.has(url)) saved.delete(url);
-        else { const s = stories.find((x) => x.url === url); if (s) saved.set(url, s); }
-        store.set('blocktalk_saved', [...saved.values()]);
-        updateSavedCount();
-        render();
-      }
+      if (!vote) return;
+      const url = vote.dataset.vote;
+      voted.has(url) ? voted.delete(url) : voted.add(url);
+      store.set('blocktalk_votes', [...voted]);
+      hideTip();
+      render();
+      feed.querySelector(`[data-vote="${CSS.escape(url)}"]`)?.classList.add('pop');
     });
+
+    // ---------- SCORE tooltip: one shared element, shown on hover, focus or tap ----------
+    const tip = $('#score-tip');
+    let tipFor = null;
+    function showTip(btn) {
+      tipFor = btn;
+      btn.setAttribute('aria-expanded', 'true');
+      const r = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+      const left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w));
+      const top = r.bottom + 8 + h > innerHeight ? r.top - h - 8 : r.bottom + 8;
+      tip.style.left = `${left}px`; tip.style.top = `${top}px`;
+      tip.classList.add('show');
+    }
+    function hideTip() {
+      tipFor?.setAttribute('aria-expanded', 'false');
+      tipFor = null;
+      tip.classList.remove('show');
+    }
+    feed.addEventListener('mouseover', (e) => { const b = e.target.closest('.help'); if (b) showTip(b); });
+    feed.addEventListener('mouseout', (e) => { if (e.target.closest('.help')) hideTip(); });
+    feed.addEventListener('focusin', (e) => { const b = e.target.closest('.help'); if (b) showTip(b); });
+    feed.addEventListener('focusout', (e) => { if (e.target.closest('.help')) hideTip(); });
+    feed.addEventListener('click', (e) => { const b = e.target.closest('.help'); if (b) { e.preventDefault(); tipFor === b ? hideTip() : showTip(b); } });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideTip(); });
+    addEventListener('scroll', hideTip, { passive: true });
 
     function renderSidebar(trending) {
       const max = Math.max(1, ...sources.map((s) => s.source_score || 0));
@@ -676,9 +764,11 @@
         const past = t <= now, next = i === nextIdx;
         const status = past ? 'Released' : next ? `Next · in ${until(t - now)}` : `In ${until(t - now)}`;
         const fp = [e.forecast && `F: ${esc(e.forecast)}`, e.previous && `P: ${esc(e.previous)}`].filter(Boolean).join(' · ') || '—';
-        return `<tr class="${past ? 'past' : next ? 'next' : ''}"><td class="when">${esc(localWhen.format(new Date(t)))}<small>${esc(etWhen.format(new Date(t)))} ET</small></td>
-          <td><span class="tl-status"><i></i>${status}</span></td><td><b>${esc(e.title)}</b></td><td><span class="asset">${esc(e.country)}</span></td><td class="note">${fp}</td></tr>`;
+        // data-label + classes let the phone layout stack each row as a card.
+        return `<tr class="${past ? 'past' : next ? 'next' : ''}"><td class="when" data-label="Date & time">${esc(localWhen.format(new Date(t)))}<small>${esc(etWhen.format(new Date(t)))} ET</small></td>
+          <td class="tl-st" data-label="Status"><span class="tl-status"><i></i>${status}</span></td><td class="ev" data-label="Event"><b>${esc(e.title)}</b></td><td class="cur" data-label="Currency"><span class="asset">${esc(e.country)}</span></td><td class="note fp" data-label="Forecast · Previous">${fp}</td></tr>`;
       }).join('') : '<tr><td colspan="5" class="note">No more high-impact events this week. Switch to “Full week” to see what was released.</td></tr>';
+      body.removeAttribute('aria-busy');
       if (calendarAt) {
         const m = Math.floor((now - calendarAt) / 60000);
         $('#timeline-updated').textContent = `Updated ${m < 1 ? 'just now' : `${m}m ago`}.`;
@@ -704,7 +794,7 @@
       $('#timeline-page').classList.toggle('show', isTimeline);
       document.querySelectorAll('nav a').forEach((l) => l.classList.toggle('active', l.dataset.view === view));
       if (isTimeline) return renderTimeline();
-      if (stories.length || view === 'saved') render({ entrance });
+      if (stories.length) render({ entrance });
     }
     function setFilter(next) {
       filter = next;
@@ -756,6 +846,7 @@
         }).join('');
         // Duplicated so the -50% marquee loops seamlessly.
         $('#ticker-track').innerHTML = items + items.replace(/ flash/g, '');
+        $('#ticker-track').removeAttribute('aria-busy');
         lastStats = [d.volume24h && `<span>24H VOL: <b>${big(d.volume24h)}</b></span>`, d.marketCap && `<span>MCAP: <b>${big(d.marketCap)}</b> ${pct(d.marketCapChange24h)}</span>`].filter(Boolean).join('');
         pricesAt = Date.now();
         tickAge();
@@ -894,6 +985,7 @@
         const d = await r.json();
         $('#mv-up').innerHTML = moverRows(d.gainers);
         $('#mv-down').innerHTML = moverRows(d.losers);
+        ['#mv-up', '#mv-down'].forEach((s) => $(s).removeAttribute('aria-busy'));
         moversAt = Date.parse(d.updated_at) || Date.now();
         tickClock();
         requestAnimationFrame(() => requestAnimationFrame(() =>
@@ -946,6 +1038,23 @@
       }
     }
 
+    // ---------- theme: Auto (follows the OS) → Light → Dark ----------
+    const THEMES = { auto: ['auto', 'Auto', 'follows your system setting'], light: ['sun', 'Light', 'light'], dark: ['moon', 'Dark', 'dark'] };
+    function applyTheme(mode) {
+      if (mode === 'auto') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = mode;
+      const [ic, label, desc] = THEMES[mode];
+      $('#theme-btn').innerHTML = `${icon(ic)}<span>${label}</span>`;
+      $('#theme-btn').setAttribute('aria-label', `Theme: ${desc}. Click to change.`);
+    }
+    let themeMode = (() => { try { const t = localStorage.getItem('bt_theme'); return t === 'light' || t === 'dark' ? t : 'auto'; } catch { return 'auto'; } })();
+    applyTheme(themeMode);
+    $('#theme-btn').addEventListener('click', () => {
+      themeMode = themeMode === 'auto' ? 'light' : themeMode === 'light' ? 'dark' : 'auto';
+      try { themeMode === 'auto' ? localStorage.removeItem('bt_theme') : localStorage.setItem('bt_theme', themeMode); } catch {}
+      applyTheme(themeMode);
+    });
+
     // ---------- boot ----------
     startBeams();
     loadOnchain();
@@ -957,7 +1066,6 @@
     setInterval(renderTimeline, 60 * 1000);
     tickClock();
     setInterval(tickClock, 30 * 1000);
-    updateSavedCount();
     // The server embeds today's feed in the page (for crawlers and a fast first
     // paint); fall back to fetching it when the page was served without it.
     const initial = (() => { try { return JSON.parse($('#initial-news')?.textContent || 'null'); } catch { return null; } })();
