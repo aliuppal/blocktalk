@@ -139,7 +139,7 @@
     .feed{display:flex;flex-direction:column;gap:10px;min-width:0}
 
     /* ---- story card ---- */
-    .story{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px;padding:16px 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);transition:border-color .2s}
+    .story{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 62px;gap:14px;padding:16px 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);transition:border-color .2s}
     .story:before{content:'';position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 0 1px var(--accent-line),0 12px 32px -14px var(--glow);opacity:0;transition:opacity .25s ease;pointer-events:none}
     .story:hover:before{opacity:1}
     .num{font:600 14px var(--font-mono);color:var(--dim);padding-top:2px}
@@ -173,10 +173,20 @@
     .also a{display:inline-flex;align-items:center;gap:5px;font:500 10.5px var(--font-mono);text-decoration:none;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;transition:color .15s,border-color .15s,transform .15s var(--ease)}
     .also a .fav{width:12px;height:12px;border-radius:50%}
     .also a:hover{color:var(--text);border-color:var(--line-2);transform:translateY(-1px)}
+    .vote{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;align-self:start;width:62px;padding:9px 0 8px;border:1px solid var(--line-2);border-radius:5px;background:var(--panel-2);color:var(--muted);transition:border-color .15s,color .15s,transform .15s var(--ease)}
+    .vote:hover{border-color:var(--accent-line);color:var(--accent)}
+    .vote:active{transform:scale(.94)}
+    .vote.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+    .vote.pop{animation:pop .35s var(--ease)}@keyframes pop{50%{transform:scale(1.12)}}
+    .vote svg{width:13px;height:13px;stroke-width:2.2}
+    .vote b{font:700 13px var(--font-mono);color:var(--text)}
+    .vote small{font:600 8.5px var(--font-mono);letter-spacing:.1em;color:var(--dim)}
 
-    .story.featured{grid-template-columns:minmax(0,1fr);padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),transparent 60%),var(--panel)}
+    .story.featured{grid-template-columns:minmax(0,1fr) 70px;padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),transparent 60%),var(--panel)}
     .story.featured .num{display:none}
     .story.featured h2{font-size:21px;line-height:1.3}
+    .story.featured .vote{width:70px;padding:12px 0 10px}
+    .story.featured .vote b{font-size:15px}
     .story.featured .summary{font-size:14px}
     .story:not(.featured){padding:13px 16px 12px}
     .story:not(.featured) .also{margin-top:8px}
@@ -351,8 +361,8 @@
       nav a{white-space:nowrap}nav a.active:after{bottom:-2px}
       .live{margin-left:16px}
       .filters{flex-direction:column;align-items:stretch}.sort{justify-content:flex-end}
-      .story{grid-template-columns:minmax(0,1fr);padding:14px}.story .num{display:none}
-      .story.featured{grid-template-columns:minmax(0,1fr)}
+      .story{grid-template-columns:minmax(0,1fr) 54px;padding:14px}.story .num{display:none}
+      .vote{width:54px}.story.featured{grid-template-columns:minmax(0,1fr) 54px}.story.featured .vote{width:54px}
       .story.featured h2{font-size:18px}
       kbd{display:none}.meta .dom{display:none}
       .theme-btn{order:2;padding:0 9px}.theme-btn span{display:none}
@@ -544,10 +554,11 @@
 
     // ---------- state ----------
     let stories = [], sources = [], filter = 'top', view = 'top', sort = 'rank', query = '';
+    let voted = new Set(store.get('blocktalk_votes', []));
     const feed = $('#feed');
     // Outlet favicons (Google's favicon service); hidden if they fail to load.
     const fav = (domain, size = 14) => domain ? `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32" alt="" width="${size}" height="${size}" loading="lazy" onerror="this.remove()">` : '';
-    const rankScore = (s) => s.score;   // server-side rank (coverage, source, freshness, trending)
+    const rankScore = (s) => s.score + (voted.has(s.url) ? 25 : 0);
 
     function visibleStories() {
       let list = [...stories];
@@ -568,6 +579,7 @@
       const t = tone(s.title);
       const fresh = ageH(s.published_at) < BREAKING_H;
       const also = s.also?.length ? `<div class="also"><small>ALSO ON</small>${s.also.map((a) => `<a href="${esc(safeUrl(a.url))}" ${ext}>${fav(a.domain, 12)}${esc(a.source)}</a>`).join('')}</div>` : '';
+      const pts = Math.round(rankScore(s));
       return `<article class="story${featured ? ' featured' : ''}" data-key="${esc(s.url)}" style="--i:${Math.min(i, 14)}">
         <div class="num">${String(i + 1).padStart(2, '0')}</div>
         <div class="body">
@@ -586,6 +598,7 @@
           </div>
           ${also}
         </div>
+        <button class="vote${voted.has(s.url) ? ' on' : ''}" data-vote="${esc(s.url)}" aria-pressed="${voted.has(s.url)}" aria-label="Upvote, score ${pts}">${icon('up')}<b>${pts}</b><small>SCORE</small></button>
       </article>`;
 
     }
@@ -616,6 +629,16 @@
       });
     }
 
+
+    feed.addEventListener('click', (e) => {
+      const vote = e.target.closest('[data-vote]');
+      if (!vote) return;
+      const url = vote.dataset.vote;
+      voted.has(url) ? voted.delete(url) : voted.add(url);
+      store.set('blocktalk_votes', [...voted]);
+      render();
+      feed.querySelector(`[data-vote="${CSS.escape(url)}"]`)?.classList.add('pop');
+    });
 
     function renderSidebar(trending) {
       const max = Math.max(1, ...sources.map((s) => s.source_score || 0));
