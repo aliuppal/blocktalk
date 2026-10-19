@@ -26,8 +26,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Theme: dark by default, light when the OS prefers it, or forced with
-       <html data-theme="light|dark"> from the header toggle. */
+    /* Theme: dark by default; <html data-theme="light"> (header toggle) switches to light. */
     :root{
       --bg:#0a0e0d;--grid:rgba(255,255,255,.028);--panel:#111715;--panel-2:#161d1a;--line:#212a26;--line-2:#2d3833;
       --text:#e7ece8;--text-strong:#f7faf8;--muted:#8d9892;--dim:#5e6964;
@@ -49,18 +48,6 @@
       --t-markets:#15803d;--t-defi:#0369a1;--t-policy:#b45309;--t-bitcoin:#c2410c;--t-ethereum:#6d28d9;--t-industry:#475569;
       --ticker-bg:#eaefeb;--header-bg:rgba(245,247,245,.9);--glow:rgba(21,128,61,.3);--sk:rgba(15,40,25,.07);--sk-shine:rgba(255,255,255,.6);
       color-scheme:light;
-    }
-    @media (prefers-color-scheme: light){
-      :root:not([data-theme="dark"]){
-        --bg:#f5f7f5;--grid:rgba(15,40,25,.05);--panel:#ffffff;--panel-2:#f0f3f1;--line:#e0e6e2;--line-2:#cdd6d0;
-        --text:#17221c;--text-strong:#0a120d;--muted:#4f5d55;--dim:#76837b;
-        --accent:#15803d;--accent-ink:#ffffff;--accent-soft:rgba(21,128,61,.09);--accent-line:rgba(21,128,61,.34);
-        --up:#15803d;--down:#dc2626;--breaking:#dc2626;--breaking-soft:rgba(220,38,38,.07);
-        --up-soft:rgba(21,128,61,.09);--down-soft:rgba(220,38,38,.08);
-        --t-markets:#15803d;--t-defi:#0369a1;--t-policy:#b45309;--t-bitcoin:#c2410c;--t-ethereum:#6d28d9;--t-industry:#475569;
-        --ticker-bg:#eaefeb;--header-bg:rgba(245,247,245,.9);--glow:rgba(21,128,61,.3);--sk:rgba(15,40,25,.07);--sk-shine:rgba(255,255,255,.6);
-        color-scheme:light;
-      }
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-display);-webkit-font-smoothing:antialiased}
@@ -152,7 +139,7 @@
     .feed{display:flex;flex-direction:column;gap:10px;min-width:0}
 
     /* ---- story card ---- */
-    .story{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 62px;gap:14px;padding:16px 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);transition:border-color .2s}
+    .story{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px;padding:16px 16px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);transition:border-color .2s}
     .story:before{content:'';position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 0 0 1px var(--accent-line),0 12px 32px -14px var(--glow);opacity:0;transition:opacity .25s ease;pointer-events:none}
     .story:hover:before{opacity:1}
     .num{font:600 14px var(--font-mono);color:var(--dim);padding-top:2px}
@@ -186,33 +173,13 @@
     .also a{display:inline-flex;align-items:center;gap:5px;font:500 10.5px var(--font-mono);text-decoration:none;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;transition:color .15s,border-color .15s,transform .15s var(--ease)}
     .also a .fav{width:12px;height:12px;border-radius:50%}
     .also a:hover{color:var(--text);border-color:var(--line-2);transform:translateY(-1px)}
-    /* Score column: upvote button + "SCORE (?)" label with a shared tooltip. */
-    .vote-col{display:flex;flex-direction:column;align-items:center;gap:5px;align-self:start}
-    .score-lbl{display:inline-flex;align-items:center;gap:4px;font:600 8.5px var(--font-mono);letter-spacing:.1em;color:var(--dim)}
-    .help{display:inline-grid;place-items:center;width:14px;height:14px;padding:0;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--muted);font:700 9px var(--font-mono);letter-spacing:0;cursor:help}
-    .help:hover,.help:focus-visible,.help[aria-expanded="true"]{color:var(--text);border-color:var(--dim)}
-    .tip{position:fixed;z-index:50;width:260px;padding:12px 14px;border-radius:6px;background:var(--panel);border:1px solid var(--line-2);box-shadow:0 12px 32px -12px rgba(0,0,0,.45);font:500 11.5px/1.55 var(--font-mono);color:var(--muted);opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s,transform .15s var(--ease)}
-    .tip.show{opacity:1;transform:none}
-    .tip b{color:var(--text)}
-    .tip ul{margin:6px 0 6px;padding-left:16px}.tip li{margin:2px 0}
-    .tip small{display:block;color:var(--dim);margin-top:4px}
-    .vote{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;align-self:start;width:62px;padding:9px 0 8px;border:1px solid var(--line-2);border-radius:5px;background:var(--panel-2);color:var(--muted);transition:border-color .15s,color .15s,transform .15s var(--ease)}
-    .vote:hover{border-color:var(--accent-line);color:var(--accent)}
-    .vote:active{transform:scale(.94)}
-    .vote.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-    .vote.pop{animation:pop .35s var(--ease)}@keyframes pop{50%{transform:scale(1.12)}}
-    .vote svg{width:13px;height:13px;stroke-width:2.2}
-    .vote b{font:700 13px var(--font-mono);color:var(--text)}
-    .vote small{font:600 8.5px var(--font-mono);letter-spacing:.1em;color:var(--dim)}
 
-    .story.featured{grid-template-columns:minmax(0,1fr) 70px;padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),transparent 60%),var(--panel)}
+    .story.featured{grid-template-columns:minmax(0,1fr);padding:20px 20px 18px;border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),transparent 60%),var(--panel)}
     .story.featured .num{display:none}
     .story.featured h2{font-size:21px;line-height:1.3}
     .story.featured .summary{font-size:14px}
     .story:not(.featured){padding:13px 16px 12px}
     .story:not(.featured) .also{margin-top:8px}
-    .story.featured .vote{width:70px;padding:12px 0 10px}
-    .story.featured .vote b{font-size:15px}
 
     .empty,.error{padding:48px 24px;text-align:center;color:var(--muted);font:13px var(--font-mono);border:1px dashed var(--line-2);border-radius:var(--radius)}
     .error button{margin-top:14px;border:1px solid var(--line-2);background:var(--panel);border-radius:5px;padding:8px 14px;font:600 12px var(--font-mono)}
@@ -384,8 +351,8 @@
       nav a{white-space:nowrap}nav a.active:after{bottom:-2px}
       .live{margin-left:16px}
       .filters{flex-direction:column;align-items:stretch}.sort{justify-content:flex-end}
-      .story{grid-template-columns:minmax(0,1fr) 54px;padding:14px}.story .num{display:none}
-      .vote{width:54px}.story.featured{grid-template-columns:minmax(0,1fr) 54px}.story.featured .vote{width:54px}
+      .story{grid-template-columns:minmax(0,1fr);padding:14px}.story .num{display:none}
+      .story.featured{grid-template-columns:minmax(0,1fr)}
       .story.featured h2{font-size:18px}
       kbd{display:none}.meta .dom{display:none}
       .theme-btn{order:2;padding:0 9px}.theme-btn span{display:none}
@@ -398,15 +365,12 @@
 </head>
 <body>
   <div class="bg" aria-hidden="true" id="bg"></div>
-  <div class="tip" id="score-tip" role="tooltip"><b>How SCORE works</b><ul><li><b>Coverage</b>: +30 for each other outlet running the story (max +180)</li><li><b>Source authority</b>: 40–80 by outlet</li><li><b>Freshness</b>: up to +100, halves every 18h</li><li><b>Trending topics</b>: up to +40</li><li><b>Your upvote</b>: +25 (this browser only)</li></ul><small>Re-ranked daily from 12 newsrooms.</small></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></symbol>
     <symbol id="i-term" viewBox="0 0 24 24"><path d="M5 7l5 5-5 5M12 18h7"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
-    <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
-    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></symbol>
     <symbol id="i-trend-up" viewBox="0 0 24 24"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></symbol>
     <symbol id="i-trend-down" viewBox="0 0 24 24"><path d="M4 8l5 5 4-4 7 7"/><path d="M15 16h5v-5"/></symbol>
     <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></symbol>
@@ -432,7 +396,7 @@
         <a href="/blog">Blog</a>
       </nav>
       <label class="search"><svg class="i"><use href="#i-search"/></svg><span class="sr">Search stories</span><input id="q" type="search" placeholder="Search stories, sources…" autocomplete="off"><kbd>/</kbd></label>
-      <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: follows your system setting"><svg class="i"><use href="#i-auto"/></svg><span>Auto</span></button>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: dark. Switch to light."><svg class="i"><use href="#i-moon"/></svg><span>Dark</span></button>
     </div>
   </header>
 
@@ -580,11 +544,10 @@
 
     // ---------- state ----------
     let stories = [], sources = [], filter = 'top', view = 'top', sort = 'rank', query = '';
-    let voted = new Set(store.get('blocktalk_votes', []));
     const feed = $('#feed');
     // Outlet favicons (Google's favicon service); hidden if they fail to load.
     const fav = (domain, size = 14) => domain ? `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32" alt="" width="${size}" height="${size}" loading="lazy" onerror="this.remove()">` : '';
-    const rankScore = (s) => s.score + (voted.has(s.url) ? 25 : 0);
+    const rankScore = (s) => s.score;   // server-side rank (coverage, source, freshness, trending)
 
     function visibleStories() {
       let list = [...stories];
@@ -605,7 +568,6 @@
       const t = tone(s.title);
       const fresh = ageH(s.published_at) < BREAKING_H;
       const also = s.also?.length ? `<div class="also"><small>ALSO ON</small>${s.also.map((a) => `<a href="${esc(safeUrl(a.url))}" ${ext}>${fav(a.domain, 12)}${esc(a.source)}</a>`).join('')}</div>` : '';
-      const pts = Math.round(rankScore(s));
       return `<article class="story${featured ? ' featured' : ''}" data-key="${esc(s.url)}" style="--i:${Math.min(i, 14)}">
         <div class="num">${String(i + 1).padStart(2, '0')}</div>
         <div class="body">
@@ -624,11 +586,8 @@
           </div>
           ${also}
         </div>
-        <div class="vote-col">
-          <button class="vote${voted.has(s.url) ? ' on' : ''}" data-vote="${esc(s.url)}" aria-pressed="${voted.has(s.url)}" aria-label="Upvote, score ${pts}">${icon('up')}<b>${pts}</b></button>
-          <span class="score-lbl">SCORE<button type="button" class="help" aria-label="How the score is calculated" aria-describedby="score-tip" aria-expanded="false">?</button></span>
-        </div>
       </article>`;
+
     }
 
     // FLIP: read every row's position, re-render, read again, then animate
@@ -657,41 +616,6 @@
       });
     }
 
-    feed.addEventListener('click', (e) => {
-      const vote = e.target.closest('[data-vote]');
-      if (!vote) return;
-      const url = vote.dataset.vote;
-      voted.has(url) ? voted.delete(url) : voted.add(url);
-      store.set('blocktalk_votes', [...voted]);
-      hideTip();
-      render();
-      feed.querySelector(`[data-vote="${CSS.escape(url)}"]`)?.classList.add('pop');
-    });
-
-    // ---------- SCORE tooltip: one shared element, shown on hover, focus or tap ----------
-    const tip = $('#score-tip');
-    let tipFor = null;
-    function showTip(btn) {
-      tipFor = btn;
-      btn.setAttribute('aria-expanded', 'true');
-      const r = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
-      const left = Math.max(8, Math.min(innerWidth - w - 8, r.right - w));
-      const top = r.bottom + 8 + h > innerHeight ? r.top - h - 8 : r.bottom + 8;
-      tip.style.left = `${left}px`; tip.style.top = `${top}px`;
-      tip.classList.add('show');
-    }
-    function hideTip() {
-      tipFor?.setAttribute('aria-expanded', 'false');
-      tipFor = null;
-      tip.classList.remove('show');
-    }
-    feed.addEventListener('mouseover', (e) => { const b = e.target.closest('.help'); if (b) showTip(b); });
-    feed.addEventListener('mouseout', (e) => { if (e.target.closest('.help')) hideTip(); });
-    feed.addEventListener('focusin', (e) => { const b = e.target.closest('.help'); if (b) showTip(b); });
-    feed.addEventListener('focusout', (e) => { if (e.target.closest('.help')) hideTip(); });
-    feed.addEventListener('click', (e) => { const b = e.target.closest('.help'); if (b) { e.preventDefault(); tipFor === b ? hideTip() : showTip(b); } });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideTip(); });
-    addEventListener('scroll', hideTip, { passive: true });
 
     function renderSidebar(trending) {
       const max = Math.max(1, ...sources.map((s) => s.source_score || 0));
@@ -1038,20 +962,19 @@
       }
     }
 
-    // ---------- theme: Auto (follows the OS) → Light → Dark ----------
-    const THEMES = { auto: ['auto', 'Auto', 'follows your system setting'], light: ['sun', 'Light', 'light'], dark: ['moon', 'Dark', 'dark'] };
+    // ---------- theme: Dark (default) ↔ Light, remembered per browser ----------
     function applyTheme(mode) {
-      if (mode === 'auto') delete document.documentElement.dataset.theme;
-      else document.documentElement.dataset.theme = mode;
-      const [ic, label, desc] = THEMES[mode];
-      $('#theme-btn').innerHTML = `${icon(ic)}<span>${label}</span>`;
-      $('#theme-btn').setAttribute('aria-label', `Theme: ${desc}. Click to change.`);
+      document.documentElement.dataset.theme = mode;
+      const dark = mode === 'dark';
+      $('#theme-btn').innerHTML = `${icon(dark ? 'moon' : 'sun')}<span>${dark ? 'Dark' : 'Light'}</span>`;
+      $('#theme-btn').setAttribute('aria-label', `Theme: ${dark ? 'dark' : 'light'}. Switch to ${dark ? 'light' : 'dark'}.`);
+      $('#theme-btn').setAttribute('aria-pressed', String(!dark));
     }
-    let themeMode = (() => { try { const t = localStorage.getItem('bt_theme'); return t === 'light' || t === 'dark' ? t : 'auto'; } catch { return 'auto'; } })();
+    let themeMode = (() => { try { return localStorage.getItem('bt_theme') === 'light' ? 'light' : 'dark'; } catch { return 'dark'; } })();
     applyTheme(themeMode);
     $('#theme-btn').addEventListener('click', () => {
-      themeMode = themeMode === 'auto' ? 'light' : themeMode === 'light' ? 'dark' : 'auto';
-      try { themeMode === 'auto' ? localStorage.removeItem('bt_theme') : localStorage.setItem('bt_theme', themeMode); } catch {}
+      themeMode = themeMode === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('bt_theme', themeMode); } catch {}
       applyTheme(themeMode);
     });
 
