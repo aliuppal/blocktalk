@@ -1,8 +1,8 @@
 {
   "outputDirectory": "public",
   "crons": [
-    { "path": "/api/cron/scrape?slot=12utc", "schedule": "45 12 * * *" },
-    { "path": "/api/cron/scrape?slot=13utc", "schedule": "45 13 * * *" }
+    { "path": "/api/cron/scrape?slot=11utc", "schedule": "45 11 * * *" },
+    { "path": "/api/cron/scrape?slot=12utc", "schedule": "45 12 * * *" }
   ],
   "redirects": [
     {
